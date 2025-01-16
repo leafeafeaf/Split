@@ -1,5 +1,6 @@
 package kr.co.shortenurlservice.presentation;
 
+import kr.co.shortenurlservice.domain.LackOfShortenUrlKeyException;
 import kr.co.shortenurlservice.domain.NotFoundShortenUrlException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandle {
+
+    @ExceptionHandler(LackOfShortenUrlKeyException.class)
+    public ResponseEntity<String> handleLackOfShortenUrlKeyException(
+            NotFoundShortenUrlException ex
+    ) {
+        return new ResponseEntity<>("단축 URL을 찾지 못함", HttpStatus.INTERNAL_SERVER_ERROR);
+
+    }
+
+
 
     @ExceptionHandler(NotFoundShortenUrlException.class)
     public ResponseEntity<String> handleNotFoundShortenUrlException(
