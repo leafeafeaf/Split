@@ -3,44 +3,16 @@
 
 # 📜  info&Site
 
-### 1️⃣ GitLab
-
 [](https://lab.ssafy.com/s12-webmobile3-sub1/S12P11B202)
-
-### 3️⃣ 플립 및 휴게 공간 사용 현황
-
-[https://docs.google.com/spreadsheets/d/1jMW268q0ynnfjYKFlodogMf1DuA82MV1YKtNzrZ3MNM/edit?gid=339525536#gid=339525536](https://docs.google.com/spreadsheets/d/1jMW268q0ynnfjYKFlodogMf1DuA82MV1YKtNzrZ3MNM/edit?gid=339525536#gid=339525536)
-
-### 2️⃣ JIRA
-
 [내 작업 - Jira](https://ssafy.atlassian.net/jira/your-work)
-
-### 4️⃣ 컨설턴트님 미팅 신청
-
-[정 용기](https://zcal.co/ykjeong)
 
 </aside>
 
-[제목 없음](B202%20174ffc8046b6808c9c4dd1a339a4444e/%E1%84%8C%E1%85%A6%E1%84%86%E1%85%A9%E1%86%A8%20%E1%84%8B%E1%85%A5%E1%86%B9%E1%84%8B%E1%85%B3%E1%86%B7%20fcf5da0d30714eb6b6cb03e5cd01bf7e.csv)
-
 # 📜  Ground Rule
+<img src="./ground.jpg" width="70%" alt="ground">
+
 
 # 👪  About Us
-
-1. 9시 1분은 9시가 아니다.
-2. 매일 아침 스크럼 진행
-3. 주 회의 매주 “화”요일 진행
-4. 일정 발생시 즉시 팀에게 전달
-5. 팀원 간 반말하기 
-6. 한시간 내로 문제 해결 안되면 즉시 공유
-7. 주에 한 번 필수 팀원 간 리프레쉬 산책 
-8. 개발 집중기간을 준수한다.          
-9. 이끌거나 , 따르거나, 떠나거나 !
-    
-    ✍️ dev 9 - 6 time
-    
-
-정기회의 : 
 
 [편민준](https://www.notion.so/174ffc8046b68058bf70c3d74dd2a320?pvs=21)
 
@@ -88,9 +60,12 @@
 
 [](https://www.notion.so/17bffc8046b68038a0f5e2afcb7b5022?pvs=21)
 
-## 회의록
+## 스크럼 & 정기회의 
+일주일 간격으로 스크럼 마스터를 선정해 매일 아침 10:00에 스크럼을 진행했습니다.
+아이디어 기획기간 중 번이 10번의 스크럼 및 회의가 진행되었고, 스크럼에서는 팀원들이 각자의 진행 상황을 공유하고 발생한 이슈들을 함께 논의하여 프로젝트를 원활하게 진행할 수 있었습니다.
+또한 프로젝트의 성공적인 완수를 위해 초기 단계에서 체계적인 기획 과정을 거쳤으며, 이를 통해 팀원들의 다양한 아이디어를 수렴하고 프로젝트의 방향성을 명확히 설정할 수 있었습니다.
 
-[제목 없음](B202%20174ffc8046b6808c9c4dd1a339a4444e/%E1%84%8C%E1%85%A6%E1%84%86%E1%85%A9%E1%86%A8%20%E1%84%8B%E1%85%A5%E1%86%B9%E1%84%8B%E1%85%B3%E1%86%B7%20df91ead5d0774817a2e12315311d128e.csv)
+![image.png](./image.png)
 
 ---
 
