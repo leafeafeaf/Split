@@ -35,10 +35,8 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'pwd'
-                sh 'ls -al'
                 sh '''
-                    chmod +x gradlew
+                    chmod +x ./backend/Split/gradlew
                     # gradle 빌드 시 테스트 스킵 (-x test)
                     # 메모리 제한 (256m)
                     # 데몬 비활성화 (--no-daemon)
