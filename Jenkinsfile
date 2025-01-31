@@ -22,8 +22,8 @@ pipeline {
 
         stage('Secrets Setup') {
             steps {
-                    file(credentialsId: 'application-yaml', variable: 'applicationfile'),
                 withCredentials([
+                     file(credentialsId: 'application-yaml', variable: 'applicationfile'),
                 ]) {
                     sh '''
                         cp "$applicationfile" src/main/resources/application.yaml
