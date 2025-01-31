@@ -1,0 +1,107 @@
+from skeleton import *
+import cv2
+import tensorflow as tf
+import numpy as np
+import os
+
+def process_videos(input_folder, output_folder, fps=30):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    video_files = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
+    video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
+
+    for video_file in video_files:
+        video_path = os.path.join(input_folder, video_file)
+        output_path = os.path.join(output_folder, video_file)
+
+        # 비디오 캡처 객체 생성
+        cap = cv2.VideoCapture(video_path)
+        fps = cap.get(cv2.CAP_PROP_FPS)  # 원본 비디오 FPS 가져오기
+        print(f"Original FPS: {fps}")
+        # 프레임을 저장할 리스트 초기화
+        frames = []
+
+        # 비디오의 모든 프레임을 읽기
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+            # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frames.append(frame)
+
+        # 비디오 캡처 객체 해제
+        cap.release()
+
+        # 프레임 리스트가 비어 있는지 확인
+        if not frames:
+            print(f"No frames collected for {video_file}. Skipping...")
+            continue
+
+        # NumPy 배열로 변환
+        frames_np = np.array(frames)
+
+        # 4차원 배열이 아니면 에러 발생
+        if len(frames_np.shape) != 4:
+            print(f"Frames array is not 4-dimensional for {video_file}. Skipping...")
+            continue
+
+        # TensorFlow 텐서로 변환
+        image = tf.convert_to_tensor(frames_np, dtype=tf.uint8)
+
+        # 텐서 모양 확인
+        num_frames, image_height, image_width, channels = image.shape
+        print(f"Processing video: {video_file}")
+        print(f"Number of frames: {num_frames}, Image height: {image_height}, Image width: {image_width}, Channels: {channels}")
+
+        # Crop 영역 설정 (여기서 사용하는 함수들을 정의해두셔야 합니다)
+        crop_region = init_crop_region(image_height, image_width)
+
+        output_images = []
+
+        # 한 동영상의 frame별 keypoint좌표를 저장할 리스트
+        skel_dataset = []
+        bar = display(progress(0, num_frames-1), display_id=True)
+        for frame_idx in range(num_frames):
+            keypoint_dataset = [] # keypoint 좌표가 들어가는 배열
+            # print(frame_idx)
+            keypoints_with_scores = run_inference(
+            movenet, image[frame_idx, :, :, :], crop_region,
+            crop_size=[input_size, input_size])
+            (keypoint_xy,output_images_input) =draw_prediction_on_image(
+            image[frame_idx, :, :, :].numpy().astype(np.int32),
+            keypoints_with_scores, crop_region=None,
+            close_figure=True, output_image_height=300)
+        
+            # print(keypoint_xy)
+            # print(len(keypoint_xy))
+
+            # for i, point in enumerate(keypoint_xy):
+            #   print(f"index {i}: {point}")
+
+            # print(keypoint_xy) # 키 포인트 출력 
+            for keypoint_dict_idx in range(len(keypoint_xy)):
+                for keypoint_xy_idx in range(len(keypoint_xy[0])):
+                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
+
+            skel_dataset.append(keypoint_dataset)
+
+            output_images.append(output_images_input)
+            crop_region = determine_crop_region(
+            keypoints_with_scores, image_height, image_width)
+            # bar.update(progress(frame_idx, num_frames-1))
+        #   output_images.append(draw_prediction_on_image(
+        #       image[frame_idx, :, :, :].numpy().astype(np.int32),
+        #       keypoints_with_scores, crop_region=None,
+        #       close_figure=True, output_image_height=300))
+
+        print(skel_dataset)
+        return skel_dataset
+
+        # Prepare gif visualization.
+        output = np.stack(output_images, axis=0)
+            # print(output)
+        # 결과를 MP4로 저장
+        # to_mp4(output_images, fps=fps, input_file_path=video_path, output_folder=output_folder)
+
