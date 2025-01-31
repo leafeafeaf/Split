@@ -35,7 +35,8 @@ pipeline {
 
         stage('Build') {
             steps {
-
+                sh 'pwd'
+                sh 'ls -al'
                 sh '''
                     chmod +x gradlew
                     # gradle 빌드 시 테스트 스킵 (-x test)
