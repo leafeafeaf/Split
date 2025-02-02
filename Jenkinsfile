@@ -7,9 +7,11 @@ pipeline {
     }
 
     stages {
+        /* sh별로 루트 디렉토리로 자동으로 이동함함 */
         stage('Prepare Environment') {
             steps {
                 sh '''
+                    cd ./S12P11B202/backend/Split
                     rm -rf src/main/resources
                     mkdir -p src/main/resources
                     chmod 777 src/main/resources
@@ -19,13 +21,14 @@ pipeline {
                 '''
             }
         }
-
+        
         stage('Secrets Setup') {
             steps {
                 withCredentials([
                      file(credentialsId: 'application-yaml', variable: 'applicationfile'),
                 ]) {
                     sh '''
+                        cd ./S12P11B202/backend/Split
                         cp "$applicationfile" src/main/resources/application.yaml
                         chmod 644 src/main/resources/application.yaml
                     '''
@@ -36,11 +39,14 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    chmod +x ./backend/Split/gradlew
+                    cd ./S12P11B202/backend/Split
+
+                    # 빌드를 위한 실행권한 부여
+                    chmod +x ./gradlew
+
                     # gradle 빌드 시 테스트 스킵 (-x test)
-                    # 메모리 제한 (256m)
                     # 데몬 비활성화 (--no-daemon)
-                    ./backend/Split/gradlew clean build -x test --no-daemon
+                    ./gradlew clean build -x test --no-daemon
                 '''
             }
         }
@@ -48,18 +54,24 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 script {
-                    sh 'docker rm -f ${CONTAINER_NAME} || true'
-                    sh 'docker rmi ${DOCKER_IMAGE} || true'
+                     sh '''
+                        cd ./S12P11B202/backend/Split
 
-                    sh 'docker build -t ${DOCKER_IMAGE} .'
+                        # 컨테이너 삭제 (실행중이어도 강제로)
+                        docker rm -f ${CONTAINER_NAME} || true
+                        # 이미지 삭제
+                        docker rmi ${DOCKER_IMAGE} || true
+                        # -t 이름 부여
+                        docker build -t ${DOCKER_IMAGE} .
 
-                    sh '''
+                        # 이미지 바탕으로 컨테이너 생성 및 실행행
                         docker run -d \
                             --name ${CONTAINER_NAME} \
                             --restart unless-stopped \
                             -p 8080:8080 \
                             ${DOCKER_IMAGE}
                     '''
+
                 }
             }
         }
