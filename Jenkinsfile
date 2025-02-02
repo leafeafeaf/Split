@@ -11,7 +11,7 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 sh '''
-                    cd ./S12P11B202/backend/Split
+                    cd ./backend/Split
                     rm -rf src/main/resources
                     mkdir -p src/main/resources
                     chmod 777 src/main/resources
@@ -28,7 +28,7 @@ pipeline {
                      file(credentialsId: 'application-yaml', variable: 'applicationfile'),
                 ]) {
                     sh '''
-                        cd ./S12P11B202/backend/Split
+                        cd ./backend/Split
                         cp "$applicationfile" src/main/resources/application.yaml
                         chmod 644 src/main/resources/application.yaml
                     '''
@@ -39,7 +39,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    cd ./S12P11B202/backend/Split
+                    cd ./backend/Split
 
                     # 빌드를 위한 실행권한 부여
                     chmod +x ./gradlew
@@ -55,7 +55,7 @@ pipeline {
             steps {
                 script {
                      sh '''
-                        cd ./S12P11B202/backend/Split
+                        cd ./backend/Split
 
                         # 컨테이너 삭제 (실행중이어도 강제로)
                         docker rm -f ${CONTAINER_NAME} || true
