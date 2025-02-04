@@ -4,7 +4,7 @@ import numpy as np
 from torch.cuda import memory_allocated, empty_cache
 import torch.optim as optim
 from config import device
-
+import config
 
 def clear_memory():
     if device != 'cpu':
@@ -15,7 +15,6 @@ def clear_memory():
 
 
 def epoch(data_loader, mode = 'train'):
-    global epoch_cnt
     from training.visualization import net, loss_fn
     
     # 사용되는 변수 초기화
@@ -41,9 +40,10 @@ def epoch(data_loader, mode = 'train'):
         
         # 3. 역전파 작업 후 Gradient Descent
         if mode == 'train':
-            optim.zero_grad() # 미분을 통해 얻은 기울기를 초기화 for 다음 epoch
+            optimizer = optim.Adam(net.parameters(), lr=0.001) 
+            optimizer.zero_grad() # 미분을 통해 얻은 기울기를 초기화 for 다음 epoch
             loss.backward() # 역전파 작업
-            optim.step() # Gradient Descent 수행
+            optimizer.step() # Gradient Descent 수행
             last_grad_performed = True # for문 나가면 epoch 카운터 += 1
             
         # 4. 정확도 계산
@@ -53,7 +53,7 @@ def epoch(data_loader, mode = 'train'):
         
     # 역전파 작업 후 Epoch 카운터 += 1
     if last_grad_performed:
-        epoch_cnt += 1
+        config.epoch_cnt += 1
         
     clear_memory()
         
@@ -61,10 +61,9 @@ def epoch(data_loader, mode = 'train'):
     return np.average(iter_loss), np.average(iter_acc)
 
 def epoch_not_finished():
-    from training.visualization import epoch_cnt
     # 에폭이 끝남을을 판단
-    maximum_epoch = 50
-    return epoch_cnt < maximum_epoch
+    maximum_epoch = 5
+    return config.epoch_cnt < maximum_epoch
 
 
 

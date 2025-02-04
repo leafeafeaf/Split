@@ -5,17 +5,18 @@ import numpy as np
 import os
 
 def process_videos(input_folder, output_folder, fps=30):
+    cnt = 1
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
     video_files = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
     video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-
+    skel_dataset = []
     for video_file in video_files:
         video_path = os.path.join(input_folder, video_file)
         output_path = os.path.join(output_folder, video_file)
-
-        # 비디오 캡처 객체 생성
+        skel_per_video = []
+        # 비디오 캡처 객체 생성 
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)  # 원본 비디오 FPS 가져오기
         print(f"Original FPS: {fps}")
@@ -61,8 +62,8 @@ def process_videos(input_folder, output_folder, fps=30):
         output_images = []
 
         # 한 동영상의 frame별 keypoint좌표를 저장할 리스트
-        skel_dataset = []
-        bar = display(progress(0, num_frames-1), display_id=True)
+        
+        # bar = display(progress(0, num_frames-1), display_id=True)
         for frame_idx in range(num_frames):
             keypoint_dataset = [] # keypoint 좌표가 들어가는 배열
             # print(frame_idx)
@@ -81,12 +82,12 @@ def process_videos(input_folder, output_folder, fps=30):
             #   print(f"index {i}: {point}")
 
             # print(keypoint_xy) # 키 포인트 출력 
-            for keypoint_dict_idx in range(len(keypoint_xy)):
-                for keypoint_xy_idx in range(len(keypoint_xy[0])):
-                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-
-            skel_dataset.append(keypoint_dataset)
-
+            if keypoint_xy is not None and keypoint_xy.shape[0] == 17:   # 17개 관절이 모두 있어야 함
+                for keypoint_dict_idx in range(len(keypoint_xy)):
+                    for keypoint_xy_idx in range(len(keypoint_xy[0])):
+                        keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
+            if len(keypoint_dataset) == 34:
+                skel_per_video.append(keypoint_dataset)
             output_images.append(output_images_input)
             crop_region = determine_crop_region(
             keypoints_with_scores, image_height, image_width)
@@ -95,13 +96,11 @@ def process_videos(input_folder, output_folder, fps=30):
         #       image[frame_idx, :, :, :].numpy().astype(np.int32),
         #       keypoints_with_scores, crop_region=None,
         #       close_figure=True, output_image_height=300))
-
-        print(skel_dataset)
-        return skel_dataset
-
-        # Prepare gif visualization.
         output = np.stack(output_images, axis=0)
-            # print(output)
+        skel_dataset.append(skel_per_video)
+
+    return skel_dataset
+
         # 결과를 MP4로 저장
         # to_mp4(output_images, fps=fps, input_file_path=video_path, output_folder=output_folder)
 
@@ -163,18 +162,20 @@ def process_video_infer(video_path, output_folder, fps=30):
         )
 
         # 키포인트 시각화 및 데이터 추출
-        output_image, keypoint_xy = draw_prediction_on_image(
+        keypoint_xy, output_image = draw_prediction_on_image(
             image[frame_idx, :, :, :].numpy().astype(np.int32),
             keypoints_with_scores, crop_region=None,
             close_figure=True, output_image_height=300
         )
 
         # 키포인트 데이터 저장
-        for keypoint_dict_idx in range(len(keypoint_xy)):
-            for keypoint_xy_idx in range(len(keypoint_xy[0])):
-                keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-
-        skel_dataset.append(keypoint_dataset)
+        if keypoint_xy is not None and keypoint_xy.shape[0] == 17: 
+            for keypoint_dict_idx in range(len(keypoint_xy)):
+                for keypoint_xy_idx in range(len(keypoint_xy[0])):
+                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
+                    
+        if len(keypoint_dataset) == 34:
+            skel_dataset.append(keypoint_dataset)
         output_images.append(output_image)
 
         # 새로운 crop_region 업데이트
@@ -186,6 +187,7 @@ def process_video_infer(video_path, output_folder, fps=30):
     return skel_dataset, output_images
 
 def to_mp4(images, fps, input_file_path, output_folder):
+    print("IN to_mp4 --- ")
     print(images[0].shape)
     height, width, _ = images[0].shape
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # mp4v 코덱 사용

@@ -5,6 +5,7 @@ from torch.optim import Adam
 from training.model import skel_LSTM
 from config import device
 import torch.nn as nn
+import config
 
 def init_model():
     plt.rc('font', size = 10)
@@ -14,8 +15,7 @@ def init_model():
     optim = Adam(net.parameters(), lr=0.0001)
 
 def init_epoch():
-    global epoch_cnt
-    epoch_cnt = 0
+    config.epoch_cnt = 0
 
 def init_log():
     plt.rc('font', size = 10)
@@ -28,7 +28,7 @@ def record_train_log(_tloss, _acc, _time):
     time_log.append(_time)
     tloss_log.append(_tloss)
     tacc_log.append(_acc)
-    iter_log.append(epoch_cnt)
+    iter_log.append(config.epoch_cnt)
 
 def record_valid_log(_vloss, _vacc):
     # Validation Log 기록용

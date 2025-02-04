@@ -18,7 +18,6 @@ class InputData(Dataset):
     def __getitem__(self, index):
         label = self.y[index]
         data = self.x[index]
-        # print(f"DEBUG: idx={index}, type={type(data)}, data={data}")
         return torch.Tensor(np.array(data)), torch.tensor(np.array(int(label)))
 
     def __len__(self):
