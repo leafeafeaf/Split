@@ -57,7 +57,7 @@ pipeline {
                     sh 'docker compose up -d --build'
 
                     sh '''
-                        cd ./S12P11B202/backend/Split
+                        cd ./backend/Split
                         
                         # 컨테이너 삭제 (실행중이어도 강제로)
                         docker rm -f ${CONTAINER_NAME} || true
