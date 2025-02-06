@@ -25,12 +25,11 @@ pipeline {
         stage('Secrets Setup') {
             steps {
                 withCredentials([
-                     file(credentialsId: 'application-yaml', variable: 'applicationfile'),
+                     file(credentialsId: 'env-file', variable: 'EnvFile'),
                 ]) {
                     sh '''
-                        cd ./backend/Split
-                        cp "$applicationfile" src/main/resources/application.yaml
-                        chmod 644 src/main/resources/application.yaml
+                        cp "$EnvFile" .env
+                        chmod 644 .env
                     '''
                 }
             }
@@ -54,8 +53,11 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 script {
-                     sh '''
-                        cd ./backend/Split
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d --build'
+
+                    sh 'docker rm -f ${CONTAINER_NAME} || true'
+                    sh 'docker rmi ${DOCKER_IMAGE} || true'
 
                         # 컨테이너 삭제 (실행중이어도 강제로)
                         docker rm -f ${CONTAINER_NAME} || true
