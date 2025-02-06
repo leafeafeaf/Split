@@ -57,11 +57,11 @@ public class Frame {
         this.device = device;
         this.num = num;
         this.video = video;
-        this.isSkip = false;
-        this.feedback = "";
-        this.poseSocre = BigDecimal.ZERO;
-        this.elbowAngleScore = BigDecimal.ZERO;
-        this.armStabilityScore = BigDecimal.ZERO;
-        this.speed = BigDecimal.ZERO;
+        this.isSkip = isSkip != null ? isSkip : false;
+        this.feedback = feedback != null ? feedback : "";
+        this.poseSocre = poseSocre != null ? poseSocre : BigDecimal.ZERO;
+        this.elbowAngleScore = elbowAngleScore != null ? elbowAngleScore : BigDecimal.ZERO;
+        this.armStabilityScore = armStabilityScore != null ? armStabilityScore : BigDecimal.ZERO;
+        this.speed = speed != null ? speed : BigDecimal.ZERO;
     }
 }
