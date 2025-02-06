@@ -10,11 +10,15 @@ pipeline {
         /* sh별로 루트 디렉토리로 자동으로 이동함함 */
         stage('Prepare Environment') {
             steps {
-                sh '''
-                    cd ./backend/Split
+                /*  cd ./backend/Split
                     rm -rf src/main/resources
                     mkdir -p src/main/resources
-                    chmod 777 src/main/resources
+                    chmod 777 src/main/resources */
+                
+                //cicd/html 아래 파일 모두 삭제
+                sh '''
+                   cd ./cicd/html
+                   rm ./*
 
                     # Docker 캐시 정리
                     docker system prune -f
@@ -37,6 +41,7 @@ pipeline {
 
         stage('Build') {
             steps {
+                //백엔드 빌드
                 sh '''
                     cd ./backend/Split
 
@@ -47,6 +52,17 @@ pipeline {
                     # 데몬 비활성화 (--no-daemon)
                     ./gradlew clean build -x test --no-daemon
                 '''
+                //프론트엔드 빌드
+                sh '''
+                    cd ./Frontend/spilt_FE/
+                    npm run build
+                '''
+                //프론트엔드 파일 cicd/html 아래로 이동
+
+                sh '''
+                    cp ./Frontend/spilt_FE/dist/* ./cicd/html/
+                '''
+
             }
         }
 
