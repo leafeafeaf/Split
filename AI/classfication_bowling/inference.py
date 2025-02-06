@@ -16,8 +16,8 @@ def infer():
 
     print('시퀀스 데이터 분석 중...')
     xy_list_list = []
-    test_video_path = 'C:\\Users\\SSAFY\\Documents\\oCam\\bowling_o\\bowling_o (21).mp4'  # 테스트용 영상
-    output_folder = 'C:\\Users\\SSAFY\\Documents\\output'
+    test_video_path = 'C:\\Users\\SSAFY\Desktop\\S12P11B202\\AI\\inference_video\\bowling_o (1039).mp4'  # 테스트용 영상
+    output_folder = 'C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\inference_output'
     (skel_dataset, img_list) = process_video_infer(test_video_path, output_folder)
 
 

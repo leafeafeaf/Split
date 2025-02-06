@@ -62,7 +62,7 @@ def epoch(data_loader, mode = 'train'):
 
 def epoch_not_finished():
     # 에폭이 끝남을을 판단
-    maximum_epoch = 5
+    maximum_epoch = 50
     return config.epoch_cnt < maximum_epoch
 
 

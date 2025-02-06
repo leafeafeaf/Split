@@ -3,6 +3,7 @@ import cv2
 import tensorflow as tf
 import numpy as np
 import os
+from preprocessing.labeling import labeling
 
 def process_videos(input_folder, output_folder, fps=30):
     cnt = 1
@@ -13,7 +14,10 @@ def process_videos(input_folder, output_folder, fps=30):
     video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
     skel_dataset = []
     for video_file in video_files:
+        print(video_file)
+        # video_path = video_file
         video_path = os.path.join(input_folder, video_file)
+ 
         output_path = os.path.join(output_folder, video_file)
         skel_per_video = []
         # 비디오 캡처 객체 생성 
@@ -29,6 +33,7 @@ def process_videos(input_folder, output_folder, fps=30):
             if not ret:
                 break
             # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
+            frame = cv2.resize(frame,(640,640))
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frames.append(frame)
 
@@ -97,9 +102,14 @@ def process_videos(input_folder, output_folder, fps=30):
         #       keypoints_with_scores, crop_region=None,
         #       close_figure=True, output_image_height=300))
         output = np.stack(output_images, axis=0)
-        skel_dataset.append(skel_per_video)
+        print(f"skel_per_video : {skel_per_video}")
+        print(f"skel_per_video_len : {len(skel_per_video)}")
 
-    return skel_dataset
+        labeling(video_file,skel_per_video)
+
+        # skel_dataset.append(skel_per_video)
+
+    # return skel_dataset
 
         # 결과를 MP4로 저장
         # to_mp4(output_images, fps=fps, input_file_path=video_path, output_folder=output_folder)
