@@ -46,4 +46,8 @@ public class Progress {
             this.time = LocalDateTime.now();
         }
     }
+
+    public void updateFrameCount(Integer currentFrameNum) {
+        this.frameCount = currentFrameNum;
+    }
 }
