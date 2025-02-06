@@ -64,4 +64,8 @@ public class Frame {
         this.armStabilityScore = armStabilityScore != null ? armStabilityScore : BigDecimal.ZERO;
         this.speed = speed != null ? speed : BigDecimal.ZERO;
     }
+
+    public void updateVideo(String video) {
+        this.video = video;
+    }
 }

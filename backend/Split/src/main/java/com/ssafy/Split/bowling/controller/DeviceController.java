@@ -3,7 +3,9 @@ package com.ssafy.Split.bowling.controller;
 
 import com.ssafy.Split.bowling.domain.dto.request.DeviceMeasurementRequest;
 import com.ssafy.Split.bowling.domain.dto.request.FrameUploadRequest;
+import com.ssafy.Split.bowling.domain.dto.request.VideoUploadRequest;
 import com.ssafy.Split.bowling.domain.dto.response.FrameUploadResponse;
+import com.ssafy.Split.bowling.domain.dto.response.VideoUploadResponse;
 import com.ssafy.Split.bowling.exception.DeviceInUseException;
 import com.ssafy.Split.bowling.exception.DeviceNotFoundException;
 import com.ssafy.Split.bowling.service.DeviceService;
@@ -64,4 +66,22 @@ public class DeviceController {
                 .build();
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/{serial}/frame/{frameNum}/video")
+    public ResponseEntity<?> uploadVideo(
+            @PathVariable String serial,
+            @PathVariable Integer frameNum,
+            @Valid @RequestBody VideoUploadRequest request){
+
+        frameService.uploadVideo(serial, frameNum, request);
+
+        return ResponseEntity.ok(VideoUploadResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("video upload successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
+
+
 }

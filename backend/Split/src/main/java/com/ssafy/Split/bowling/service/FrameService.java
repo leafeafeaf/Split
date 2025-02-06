@@ -2,11 +2,14 @@ package com.ssafy.Split.bowling.service;
 
 
 import com.ssafy.Split.bowling.domain.dto.request.FrameUploadRequest;
+import com.ssafy.Split.bowling.domain.dto.request.VideoUploadRequest;
 import com.ssafy.Split.bowling.domain.entity.Device;
 import com.ssafy.Split.bowling.domain.entity.Frame;
 import com.ssafy.Split.bowling.domain.entity.Progress;
 import com.ssafy.Split.bowling.exception.DeviceNotFoundException;
+import com.ssafy.Split.bowling.exception.FrameNotFoundException;
 import com.ssafy.Split.bowling.exception.ProgressNotFoundException;
+import com.ssafy.Split.bowling.exception.InvalidVideoUrlException;
 import com.ssafy.Split.bowling.repository.DeviceRepository;
 import com.ssafy.Split.bowling.repository.FrameRepository;
 import com.ssafy.Split.bowling.repository.ProgressRepository;
@@ -26,6 +29,7 @@ public class FrameService {
 
     @Transactional
     public Integer uploadFrame(String serial, FrameUploadRequest request) {
+
         // Device 조회
         Device device = deviceRepository.findBySerialNumber(Integer.valueOf(serial))
                 .orElseThrow(() -> new DeviceNotFoundException("Device not found with serial: " + serial));
@@ -59,5 +63,31 @@ public class FrameService {
         log.info("Frame uploaded for device {}: {}", serial, frame);
 
         return currentFrameNum;
+    }
+
+    public void uploadVideo(String serial, Integer frameNum, VideoUploadRequest request) {
+        // Device 조회
+        Device device = deviceRepository.findBySerialNumber(Integer.valueOf(serial))
+                .orElseThrow(() -> new DeviceNotFoundException("Device not found with serial: " + serial));
+
+        // 진행 중인 Progress 조회
+        Progress progress = progressRepository.findByDeviceSerialNumber(Integer.valueOf(serial))
+                .orElseThrow(() -> new ProgressNotFoundException("No active progress found for device: " + serial));
+
+        // Frame 조회
+        Frame frame = frameRepository.findByProgressIdAndNum(progress.getId(), frameNum)
+                .orElseThrow(() -> new FrameNotFoundException("Frame not found: " + frameNum));
+
+        // 비디오 URL 업데이트
+        frame.updateVideo(request.getVideo());
+        frameRepository.save(frame);
+
+        // 비디오 URL이 이미 존재하는지 체크
+        if (frame.getVideo() == null && frame.getVideo().trim().isEmpty()) {
+            throw new InvalidVideoUrlException("Video URL already exists");
+        }
+
+
+        log.info("Video URL updated for frame {} of device {}: {}", frameNum, serial, request.getVideo());
     }
 }
