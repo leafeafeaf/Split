@@ -22,12 +22,12 @@ pipeline {
 
         stage('Secrets Setup') {
             steps {
-                    file(credentialsId: 'application-yaml', variable: 'applicationfile'),
                 withCredentials([
+                     file(credentialsId: 'env-file', variable: 'EnvFile'),
                 ]) {
                     sh '''
-                        cp "$applicationfile" src/main/resources/application.yaml
-                        chmod 644 src/main/resources/application.yaml
+                        cp "$EnvFile" .env
+                        chmod 644 .env
                     '''
                 }
             }
@@ -49,6 +49,9 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 script {
+                    sh 'docker-compose down'
+                    sh 'docker-compose up -d --build'
+
                     sh 'docker rm -f ${CONTAINER_NAME} || true'
                     sh 'docker rmi ${DOCKER_IMAGE} || true'
 
