@@ -7,14 +7,9 @@ pipeline {
     }
 
     stages {
-        /* sh별로 루트 디렉토리로 자동으로 이동함함 */
+        /* sh별로 루트 디렉토리로 자동으로 이동함 */
         stage('Prepare Environment') {
             steps {
-                /*  cd ./backend/Split
-                    rm -rf src/main/resources
-                    mkdir -p src/main/resources
-                    chmod 777 src/main/resources */
-                
                 //cicd/html 아래 파일 모두 삭제
                 sh '''
                    cd ./cicd/html
@@ -52,17 +47,24 @@ pipeline {
                     # 데몬 비활성화 (--no-daemon)
                     ./gradlew clean build -x test --no-daemon
                 '''
-                //프론트엔드 빌드
+            }
+        }
+         stage('Build Frontend') {
+            steps {
                 sh '''
                     cd ./Frontend/spilt_FE/
+
+                    # 의존성 설치 (기존 node_modules 유지)
+                    npm ci || npm install
+
+                    # Next.js 빌드 및 정적 변환
                     npm run build
                 '''
+
                 //프론트엔드 파일 cicd/html 아래로 이동
-
                 sh '''
-                    cp ./Frontend/spilt_FE/dist/* ./cicd/html/
+                    cp -r ./Frontend/spilt_FE/dist/* ./cicd/html/
                 '''
-
             }
         }
 
