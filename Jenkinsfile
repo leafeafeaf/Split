@@ -53,8 +53,8 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 script {
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d --build'
+                    sh 'docker compose down'
+                    sh 'docker compose up -d --build'
 
                     sh '''
                         # 컨테이너 삭제 (실행중이어도 강제로)
