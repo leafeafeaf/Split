@@ -56,9 +56,7 @@ pipeline {
                     sh 'docker-compose down'
                     sh 'docker-compose up -d --build'
 
-                    sh 'docker rm -f ${CONTAINER_NAME} || true'
-                    sh 'docker rmi ${DOCKER_IMAGE} || true'
-
+                    sh '''
                         # 컨테이너 삭제 (실행중이어도 강제로)
                         docker rm -f ${CONTAINER_NAME} || true
                         # 이미지 삭제
