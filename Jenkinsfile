@@ -63,17 +63,21 @@ pipeline {
             steps {
                 script { 
                     sh 'docker-compose down -v'
-                    sh '''
-                        set -a
-                        source <(awk -F= '{ gsub(/^[ \t]+|[ \t]+$/, "", $2); print $1 "=" $2 }' .env)
-                        set +a
-                        echo "Removing image: '$BACKEND_IMAGE_NAME'"
-                        if [ -n "$BACKEND_IMAGE_NAME" ] && docker images -q "$BACKEND_IMAGE_NAME"; then
-                            docker rmi "$BACKEND_IMAGE_NAME"
-                        else
-                            echo "Image not found or variable is empty: $BACKEND_IMAGE_NAME"
-                        fi
-                    '''
+sh '''
+    # Bash 사용하도록 변경
+    bash -c '
+    set -a
+    source <(awk -F= "{ gsub(/^[ \\t]+|[ \\t]+$/, \"\", \$2); print \$1 \"=\" \$2 }" .env)
+    set +a
+    echo "Removing image: $BACKEND_IMAGE_NAME"
+    if [ -n "$BACKEND_IMAGE_NAME" ] && docker images -q "$BACKEND_IMAGE_NAME"; then
+        docker rmi "$BACKEND_IMAGE_NAME"
+    else
+        echo "Image not found or variable is empty: $BACKEND_IMAGE_NAME"
+    fi
+    '
+'''
+
 
                     sh 'docker-compose up -d --build'
                 }
