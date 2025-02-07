@@ -63,24 +63,49 @@ pipeline {
             steps {
                 script { 
                     sh 'docker-compose down -v'
-sh '''
-    # Bash 사용하도록 변경
-    bash -c '
-    set -a
-    source <(awk -F= "{ gsub(/^[ \\t]+|[ \\t]+$/, \"\", \$2); print \$1 \"=\" \$2 }" .env)
-    set +a
-    echo "Removing image: $BACKEND_IMAGE_NAME"
-    if [ -n "$BACKEND_IMAGE_NAME" ] && docker images -q "$BACKEND_IMAGE_NAME"; then
-        docker rmi "$BACKEND_IMAGE_NAME"
-    else
-        echo "Image not found or variable is empty: $BACKEND_IMAGE_NAME"
-    fi
-    '
-'''
-
+                    sh '''
+                        # Bash 사용하도록 변경
+                        bash -c '
+                            set -a
+                            source <(awk -F= "{ gsub(/^[ \\t]+|[ \\t]+$/, \"\", \$2); print \$1 \"=\" \$2 }" .env)
+                            set +a
+                            echo "Removing image: $BACKEND_IMAGE_NAME"
+                            if [ -n "$BACKEND_IMAGE_NAME" ] && docker images -q "$BACKEND_IMAGE_NAME"; then
+                                docker rmi "$BACKEND_IMAGE_NAME"
+                            else
+                                echo "Image not found or variable is empty: $BACKEND_IMAGE_NAME"
+                            fi
+                        '
+                    '''
 
                     sh 'docker-compose up -d --build'
                 }
+            }
+        }
+    }
+
+    //메타모스트 연동
+    post {
+        success {
+        	script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: 'good', 
+                message: "빌드 성공: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)", 
+                endpoint: 'https://meeting.ssafy.com/hooks/97gr1wff138tmqum7exwc75h7c', 
+                channel: ' B202'
+                )
+            }
+        }
+        failure {
+        	script {
+                def Author_ID = sh(script: "git show -s --pretty=%an", returnStdout: true).trim()
+                def Author_Name = sh(script: "git show -s --pretty=%ae", returnStdout: true).trim()
+                mattermostSend (color: 'danger', 
+                message: "빌드 실패: ${env.JOB_NAME} #${env.BUILD_NUMBER} by ${Author_ID}(${Author_Name})\n(<${env.BUILD_URL}|Details>)", 
+                endpoint: 'https://meeting.ssafy.com/hooks/97gr1wff138tmqum7exwc75h7c', 
+                channel: 'B202'
+                )
             }
         }
     }
