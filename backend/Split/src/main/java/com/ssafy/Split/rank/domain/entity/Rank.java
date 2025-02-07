@@ -1,6 +1,6 @@
 package com.ssafy.Split.rank.domain.entity;
 
-import com.ssafy.Split.bowling.domain.entity.Game;
+import com.ssafy.Split.game.domain.entity.Game;
 import com.ssafy.Split.user.domain.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
