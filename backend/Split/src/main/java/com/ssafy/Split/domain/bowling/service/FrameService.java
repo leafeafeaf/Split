@@ -13,6 +13,8 @@ import com.ssafy.Split.domain.bowling.exception.InvalidVideoUrlException;
 import com.ssafy.Split.domain.bowling.repository.DeviceRepository;
 import com.ssafy.Split.domain.bowling.repository.FrameRepository;
 import com.ssafy.Split.domain.bowling.repository.ProgressRepository;
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -89,5 +91,12 @@ public class FrameService {
 
 
         log.info("Video URL updated for frame {} of device {}: {}", frameNum, serial, request.getVideo());
+    }
+    /** 프레임 조회 **/
+    public Frame getFrame(Integer serialNumber, Integer frameNum) {
+        Progress progress = progressRepository.findByDeviceSerialNumber(serialNumber)
+                .orElseThrow(() -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serialNumber)));
+        return frameRepository.findByProgressIdAndNum(progress.getId(), frameNum)
+                .orElseThrow(() -> new SplitException(ErrorCode.FRAME_NOT_FOUND, String.valueOf(frameNum)));
     }
 }
