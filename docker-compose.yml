@@ -10,3 +10,48 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL 인증서 마운트 (읽기 전용)
       - ./cicd/html:/usr/share/nginx/html  # 정적 파일 마운트
     restart: always  # 컨테이너가 종료되면 자동 재시작
+  app:
+    build:
+      context: ./backend/Split
+      dockerfile: Dockerfile
+    container_name: spring-boot-app
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: ${SPRING_REDIS_HOST}
+      SPRING_REDIS_PORT: ${SPRING_REDIS_PORT}
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8080:8080"
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - /home/ubuntu/mysql_data:/var/lib/mysql
+    healthcheck:
+        test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+  redis:
+    image: redis:latest
+    container_name: redis-cache
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  mysql_data:
+  
