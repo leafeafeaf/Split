@@ -1,6 +1,7 @@
 package com.ssafy.Split.domain.game.service;
 
 import com.ssafy.Split.domain.game.domain.dto.request.GameUploadRequest;
+import com.ssafy.Split.domain.game.domain.dto.response.GameListResponse;
 import com.ssafy.Split.domain.game.domain.dto.response.GameResponse;
 import com.ssafy.Split.domain.game.domain.entity.Game;
 import com.ssafy.Split.domain.game.repository.GameRepository;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Builder
@@ -77,4 +80,42 @@ public class GameService {
                 .build();
     }
 
+    public GameListResponse getGameList(int userId, Integer count) {
+        List<Game> games = count == null ?
+                gameRepository.findByUserIdOrderByGameDateDesc(userId) :
+                gameRepository.findTopNByUserIdOrderByGameDateDesc(userId, count);
+
+        if (games.isEmpty()) {
+            throw new SplitException(ErrorCode.GAME_ALREADY_DELETED);
+        }
+
+        List<GameListResponse.GameDetail> gameDetails = games.stream()
+                .map(game -> GameListResponse.GameDetail.builder()
+                        .id(game.getId())
+                        .userId(game.getUser().getId())
+                        .gameDate(game.getGameDate().toString())
+                        .isSkip(game.getIsSkip() ? 1 : 0)
+                        .poseHighscore(game.getPoseHighscore())
+                        .poseLowscore(game.getPoseLowscore())
+                        .poseAvgscore(game.getPoseAvgscore())
+                        .elbowAngleScore(game.getElbowAngleScore())
+                        .armStabilityScore(game.getArmStabilityScore())
+                        .armSpeed(game.getArmSpeed())
+                        .build())
+                .collect(Collectors.toList());
+
+        GameListResponse.GameListData listData = GameListResponse.GameListData.builder()
+                .count(gameDetails.size())
+                .gameArr(gameDetails)
+                .build();
+
+        return GameListResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("Game list retrieved successfully")
+                .data(listData)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
 }
+

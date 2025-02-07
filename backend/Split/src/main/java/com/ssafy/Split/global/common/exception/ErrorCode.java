@@ -23,7 +23,11 @@ public enum ErrorCode {
     PROGRESS_NOT_FOUND(404, "P001", "Progress not found with id: %s"),
 
     //game
-    GAME_NOT_FOUND(404, "G001", "Game not found with id: %s");
+    GAME_NOT_FOUND(404, "G001", "Game not found with id: %s"),
+    GAME_ALREADY_DELETED(404, "G002", "Game results have already been viewed and deleted"),
+
+    //user
+    USER_NOT_FOUND(404, "U001", "User not found with id: %s");
 
     private final int status; // HTTP 상태코드
     private final String code; // 비즈니스 에러

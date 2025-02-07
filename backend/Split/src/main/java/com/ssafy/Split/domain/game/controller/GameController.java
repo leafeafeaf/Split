@@ -1,6 +1,7 @@
 package com.ssafy.Split.domain.game.controller;
 
 
+import com.ssafy.Split.domain.game.domain.dto.response.GameListResponse;
 import com.ssafy.Split.domain.game.domain.dto.response.GameResponse;
 import com.ssafy.Split.domain.game.service.GameService;
 import com.ssafy.Split.domain.game.domain.dto.request.GameUploadRequest;
@@ -57,6 +58,23 @@ public class GameController {
             GameResponse response = gameService.getGame(gameId);
             return ResponseEntity.ok(response);
         }
+
+    /**  유저 id를 통한 게임 조회
+     *   차후 토큰으로 수정 필요
+     *
+     * **/
+
+    @GetMapping
+    public ResponseEntity<GameListResponse> getGameList(
+            @RequestHeader("Authorization") String userId,
+            @RequestParam(required = false) Integer count) {
+
+        GameListResponse response = gameService.getGameList(
+                Integer.parseInt(userId),
+                count
+        );
+        return ResponseEntity.ok(response);
+    }
 }
 
 
