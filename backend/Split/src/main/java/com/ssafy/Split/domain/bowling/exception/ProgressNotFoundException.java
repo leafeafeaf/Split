@@ -1,8 +1,11 @@
 package com.ssafy.Split.domain.bowling.exception;
 
-public class ProgressNotFoundException extends RuntimeException{
-    public ProgressNotFoundException(String message) {
-        super(message);
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
+
+public class ProgressNotFoundException extends SplitException {
+    public ProgressNotFoundException(String progressId) {
+        super(ErrorCode.PROGRESS_NOT_FOUND, progressId);
     }
 }
 
