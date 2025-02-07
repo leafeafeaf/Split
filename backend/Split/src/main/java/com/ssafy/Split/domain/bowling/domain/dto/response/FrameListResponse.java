@@ -1,5 +1,6 @@
 package com.ssafy.Split.domain.bowling.domain.dto.response;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,11 +13,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FrameResponse {
+public class FrameListResponse {
     private String code;
-    private int status;
+    private Integer status;
     private String message;
-    private FrameData data;
+    private List<FrameData> data;
     private String timestamp;
 
     @Getter

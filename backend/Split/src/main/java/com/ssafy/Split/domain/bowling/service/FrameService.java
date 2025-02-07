@@ -3,6 +3,8 @@ package com.ssafy.Split.domain.bowling.service;
 
 import com.ssafy.Split.domain.bowling.domain.dto.request.FrameUploadRequest;
 import com.ssafy.Split.domain.bowling.domain.dto.request.VideoUploadRequest;
+import com.ssafy.Split.domain.bowling.domain.dto.response.FrameListResponse;
+import com.ssafy.Split.domain.bowling.domain.dto.response.FrameListResponse.FrameData;
 import com.ssafy.Split.domain.bowling.domain.entity.Device;
 import com.ssafy.Split.domain.bowling.domain.entity.Frame;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
@@ -19,6 +21,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +103,27 @@ public class FrameService {
                 .orElseThrow(() -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serialNumber)));
         return frameRepository.findByProgressIdAndNum(progress.getId(), frameNum)
                 .orElseThrow(() -> new SplitException(ErrorCode.FRAME_NOT_FOUND, String.valueOf(frameNum)));
+    }
+    /** 프레임 전체조회 **/
+    public List<FrameData> getAllFrames(Integer serialNumber) {
+        Progress progress = progressRepository.findByDeviceSerialNumber(serialNumber)
+                .orElseThrow(() -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serialNumber)));
+
+        List<Frame> frames = frameRepository.findAllByProgressIdOrderByNumAsc(progress.getId());
+        return frames.stream()
+                .map(frame -> FrameData.builder()
+                        .id(frame.getId())
+                        .progressId(frame.getProgress().getId())
+                        .serialNumber(frame.getDevice().getSerialNumber())
+                        .num(frame.getNum())
+                        .video(frame.getVideo())
+                        .isSkip(frame.getIsSkip() ? 1 : 0)
+                        .feedback(frame.getFeedback())
+                        .poseScore(frame.getPoseSocre())
+                        .elbowAngleScore(frame.getElbowAngleScore())
+                        .armStabilityScore(frame.getArmStabilityScore())
+                        .speed(frame.getSpeed())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

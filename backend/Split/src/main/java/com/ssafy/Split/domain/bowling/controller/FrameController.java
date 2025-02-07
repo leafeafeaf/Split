@@ -1,6 +1,7 @@
 package com.ssafy.Split.domain.bowling.controller;
 
 
+import com.ssafy.Split.domain.bowling.domain.dto.response.FrameListResponse;
 import com.ssafy.Split.domain.bowling.domain.dto.response.FrameResponse;
 import com.ssafy.Split.domain.bowling.domain.entity.Frame;
 import com.ssafy.Split.domain.bowling.service.FrameService;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.ssafy.Split.domain.bowling.domain.dto.response.FrameListResponse.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -52,4 +56,20 @@ public class FrameController {
                 .build());
 
     }
+
+    @GetMapping("/{serialNumber}/frames")
+    public ResponseEntity<FrameListResponse> getAllFrames(
+            @PathVariable Integer serialNumber
+    ) {
+        List<FrameData> frames = frameService.getAllFrames(serialNumber);
+
+        return ResponseEntity.ok(FrameListResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("Frame data retrieved successfully")
+                .data(frames)
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
+
 }
