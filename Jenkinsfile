@@ -61,8 +61,12 @@ pipeline {
 
         stage('Docker Build & Deploy') {
             steps {
-                script {
+                script { 
                     sh 'docker-compose down -v'
+                    sh '''
+                        export $(grep -v '^#' .env | xargs)  # .env 파일을 환경변수로 로드
+                        docker rmi $BACKEND_IMAGE_NAME
+                    '''
                     sh 'docker-compose up -d --build'
                 }
             }
