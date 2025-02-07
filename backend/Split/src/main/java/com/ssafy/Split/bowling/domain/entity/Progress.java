@@ -37,6 +37,7 @@ public class Progress {
     private LocalDateTime time;
 
     @OneToMany(mappedBy = "progress")
+    @Builder.Default
     private List<Frame> frames = new ArrayList<>();
 
 
