@@ -8,6 +8,7 @@ import { NavigationBar } from "@/components/navigation-bar"
 import { PostureCard } from "@/components/check/posture-card"
 import { HandToggle } from "@/components/check/hand-toggle"
 import { ButtonPrimary } from "@/components/ui/button-primary"
+import { SerialNumberModal } from "@/components/modals/serial-number-modal"
 
 // Mock user data
 const mockUserData = {
@@ -27,6 +28,7 @@ export default function CheckPage() {
   const [selectedPosture, setSelectedPosture] = useState<number | null>(null)
   const [isRightHand, setIsRightHand] = useState(true)
   const [currentPage, setCurrentPage] = useState(0)
+  const [isSerialModalOpen, setIsSerialModalOpen] = useState(false)
 
   const handleLogout = () => {
     // Add your logout logic here
@@ -38,6 +40,12 @@ export default function CheckPage() {
       alert("Please select a posture first")
       return
     }
+    setIsSerialModalOpen(true)
+  }
+
+  const handleSerialSubmit = (serialNumber: string) => {
+    console.log("Serial Number:", serialNumber)
+    // Here you would typically send the serial number to your backend
     router.push("/check/measure")
   }
 
@@ -85,6 +93,12 @@ export default function CheckPage() {
       </div>
 
       <NavigationBar />
+
+      <SerialNumberModal
+        isOpen={isSerialModalOpen}
+        onClose={() => setIsSerialModalOpen(false)}
+        onSubmit={handleSerialSubmit}
+      />
     </div>
   )
 }
