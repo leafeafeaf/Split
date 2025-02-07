@@ -17,7 +17,6 @@ def process_videos(input_folder, output_folder, fps=30):
         print(video_file)
         # video_path = video_file
         video_path = os.path.join(input_folder, video_file)
- 
         output_path = os.path.join(output_folder, video_file)
         skel_per_video = []
         # 비디오 캡처 객체 생성 
@@ -80,12 +79,6 @@ def process_videos(input_folder, output_folder, fps=30):
             keypoints_with_scores, crop_region=None,
             close_figure=True, output_image_height=300)
         
-            # print(keypoint_xy)
-            # print(len(keypoint_xy))
-
-            # for i, point in enumerate(keypoint_xy):
-            #   print(f"index {i}: {point}")
-
             # print(keypoint_xy) # 키 포인트 출력 
             if keypoint_xy is not None and keypoint_xy.shape[0] == 17:   # 17개 관절이 모두 있어야 함
                 for keypoint_dict_idx in range(len(keypoint_xy)):

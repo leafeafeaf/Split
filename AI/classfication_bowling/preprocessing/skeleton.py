@@ -217,7 +217,6 @@ def to_mp4(images, fps, input_file_path, output_folder):
     video_writer.release()
     print(f"Video saved as {output_file}")
 
-model_name = "movenet_lightning"
 
 # if "tflite" in model_name:
 #   if "movenet_lightning_f16" in model_name:
@@ -263,6 +262,8 @@ model_name = "movenet_lightning"
 #     return keypoints_with_scores
 
 # else:
+
+model_name = "movenet_lightning"
 if "movenet_lightning" in model_name:
     module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
     input_size = 192

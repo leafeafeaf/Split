@@ -5,7 +5,7 @@ import json
 import numpy as np
 import os
 
-def save_to_json(dataset, output_file="C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\classfication_bowling\\preprocessing\\labeled_skeleton_data.json"):
+def save_to_json(dataset, output_file="C:\\Users\\SSAFY\\code\\PJT\\S12P11B202\\AI\\classfication_bowling\\preprocessing\\bowling_walking_skeleton_data.json"):
     os.makedirs(os.path.dirname(output_file), exist_ok=True)  # 폴더 없으면 생성
 
     # 기존 JSON 파일 불러오기 (파일이 있으면 로드, 없으면 빈 리스트)

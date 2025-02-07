@@ -8,7 +8,7 @@ from config import device
 
 def infer():
     from training.visualization import net
-        
+    net.load_state_dict(torch.load('best_1330.pth'))
     net.eval()
     out_img_list = []
     dataset = []
@@ -16,8 +16,8 @@ def infer():
 
     print('시퀀스 데이터 분석 중...')
     xy_list_list = []
-    test_video_path = 'C:\\Users\\SSAFY\Desktop\\S12P11B202\\AI\\inference_video\\bowling_o (1039).mp4'  # 테스트용 영상
-    output_folder = 'C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\inference_output'
+    test_video_path = 'C:\\Users\\SSAFY\\Downloads\\bowling_o (30).mp4'  # 테스트용 영상
+    output_folder = 'C:\\Users\\SSAFY\\Desktop\\infer_out\\LSTM_Modified'
     (skel_dataset, img_list) = process_video_infer(test_video_path, output_folder)
 
 
@@ -28,7 +28,7 @@ def infer():
     for idx in tqdm(range(len(skel_dataset))):
         print(f"현재 idx: {idx}")    
         # length = 10으로 해보고 안되면 20
-        length = 10
+        length = 3
         
         test_list.append(skel_dataset[idx])
         # print(f"스켈레톤 배열 크기 : {len(skel_dataset[idx])}") # expected : (17,2)
@@ -47,9 +47,9 @@ def infer():
                 with torch.no_grad():
                     result = net(data)
                     _, out = torch.max(result, 1)
-                    if out.item() == 1: status = 'Bowling'
-                    else: status = 'Not Bowling'
-            # print(f"{idx}에서 학습된 결과: {status}")
+                    if out.item() == 1: status = 'Walking'
+                    else: status = 'Bowling'
+                    print(f"{idx}에서 학습된 결과: {status}")
 
         cv2.putText(img_list[idx], status, (0, 50), cv2.FONT_HERSHEY_COMPLEX, 1.5, (0, 0, 255), 2)
         # cv2.imshow(img_list[idx])

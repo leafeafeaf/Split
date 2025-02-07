@@ -40,7 +40,8 @@ def epoch(data_loader, mode = 'train'):
         
         # 3. 역전파 작업 후 Gradient Descent
         if mode == 'train':
-            optimizer = optim.Adam(net.parameters(), lr=0.001) 
+            optimizer = optim.Adam(net.parameters(), lr=0.0005)
+            # scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=3, verbose=True)
             optimizer.zero_grad() # 미분을 통해 얻은 기울기를 초기화 for 다음 epoch
             loss.backward() # 역전파 작업
             optimizer.step() # Gradient Descent 수행
@@ -66,5 +67,8 @@ def epoch_not_finished():
     return config.epoch_cnt < maximum_epoch
 
 
-
+def save_model():
+    from training.visualization import net
+    torch.save(net.state_dict(), 'model.pth')
+    # net.load_state_dict(torch.load('model.pth'))
 
