@@ -1,4 +1,4 @@
-package com.ssafy.Split.user.controller;
+package com.ssafy.Split.domain.user.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
