@@ -1,11 +1,14 @@
 package com.ssafy.Split.domain.game.service;
 
 import com.ssafy.Split.domain.game.domain.dto.request.GameUploadRequest;
+import com.ssafy.Split.domain.game.domain.dto.response.GameResponse;
 import com.ssafy.Split.domain.game.domain.entity.Game;
 import com.ssafy.Split.domain.game.repository.GameRepository;
 import com.ssafy.Split.domain.user.domain.entity.User;
 import com.ssafy.Split.domain.user.exception.UserNotFoundException;
 import com.ssafy.Split.domain.user.repository.UserRepository;
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,4 +51,30 @@ public class GameService {
 
     return savedGame.getId();
     }
+    public GameResponse getGame(Integer gameId) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new SplitException(ErrorCode.GAME_NOT_FOUND, String.valueOf(gameId)));
+
+        GameResponse.GameData gameData = GameResponse.GameData.builder()
+                .id(game.getId())
+                .userId(game.getUser().getId())
+                .gameDate(game.getGameDate().toString())
+                .isSkip(game.getIsSkip() ? 1 : 0)
+                .poseHighscore(game.getPoseHighscore())
+                .poseLowscore(game.getPoseLowscore())
+                .poseAvgscore(game.getPoseAvgscore())
+                .elbowAngleScore(game.getElbowAngleScore())
+                .armStabilityScore(game.getArmStabilityScore())
+                .armSpeed(game.getArmSpeed())
+                .build();
+
+        return GameResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("get Game data successfully")
+                .data(gameData)
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+    }
+
 }

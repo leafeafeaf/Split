@@ -1,6 +1,7 @@
 package com.ssafy.Split.domain.game.controller;
 
 
+import com.ssafy.Split.domain.game.domain.dto.response.GameResponse;
 import com.ssafy.Split.domain.game.service.GameService;
 import com.ssafy.Split.domain.game.domain.dto.request.GameUploadRequest;
 import com.ssafy.Split.domain.game.domain.dto.response.GameUploadResponse;
@@ -10,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -53,5 +51,12 @@ public class GameController {
                             .build());
         }
     }
+    /** 게임 id로 게임 조회 **/
+        @GetMapping("/{gameId}")
+        public ResponseEntity<GameResponse> getGame(@PathVariable Integer gameId) {
+            GameResponse response = gameService.getGame(gameId);
+            return ResponseEntity.ok(response);
+        }
 }
+
 
