@@ -11,7 +11,7 @@ pipeline {
             steps {
                 //cicd/html 아래 파일 모두 삭제
                 sh 'rm -rf ./cicd/html/*'
-                sh 'docker system prune -f'
+                sh 'docker system prune -a -f'
             }
         }
         
