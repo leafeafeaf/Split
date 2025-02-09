@@ -83,4 +83,7 @@ public class User {
     public void createHighlight(String highlight) {
         this.highlight = highlight;
     }
+    public void updateThema(Integer thema) {
+        this.thema = thema;
+    }
 }

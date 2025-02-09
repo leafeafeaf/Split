@@ -1,6 +1,7 @@
 package com.ssafy.Split.domain.user.controller;
 
 import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
+import com.ssafy.Split.domain.user.domain.dto.request.ThemaRequest;
 import com.ssafy.Split.domain.user.service.UserService;
 import com.ssafy.Split.global.common.exception.ErrorResponse;
 import com.ssafy.Split.global.common.response.ApiResponse;
@@ -66,6 +67,19 @@ public class UserController {
                 .build());
     }
 
+    @PatchMapping("/thema")  // PATCH 메서드 사용
+    public ResponseEntity<ApiResponse> updateThema(
+            @RequestHeader("Authorization") String userId,  // 임시로 userId로 사용
+            @Valid @RequestBody ThemaRequest request) {
 
+        userService.updateThema(Integer.parseInt(userId), request.getValidThema());
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("put thema successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
 
 }

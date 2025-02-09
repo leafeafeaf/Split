@@ -78,8 +78,14 @@ public class UserService {
 
         log.info("Highlight updated for user {}: {}", userId, highlight);
     }
+    /** 테마 변경 **/
+    public void updateThema(Integer userId, Integer thema) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
 
-
+        user.updateThema(thema);
+        log.info("User {} thema updated to {}", userId, thema);
+    }
 
     private boolean isValidVideoUrl(String url) {
         return url != null &&
