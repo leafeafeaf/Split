@@ -75,4 +75,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Rank> ranks = new ArrayList<>();
+
+
+    public void updateHighlight(String highlight) {
+        this.highlight = highlight;
+    }
 }

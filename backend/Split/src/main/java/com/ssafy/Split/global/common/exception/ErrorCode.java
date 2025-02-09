@@ -27,7 +27,11 @@ public enum ErrorCode {
     GAME_ALREADY_DELETED(404, "G002", "Game results have already been viewed and deleted"),
 
     //user
-    USER_NOT_FOUND(404, "U001", "User not found with id: %s");
+    USER_NOT_FOUND(404, "U001", "User not found with id: %s"),
+
+    //s3
+    S3_DELETE_ERROR(500, "S001", "Error deleting file from S3"),
+    INVALID_FILE_URL(400, "S002", "Invalid file URL format");
 
     private final int status; // HTTP 상태코드
     private final String code; // 비즈니스 에러
