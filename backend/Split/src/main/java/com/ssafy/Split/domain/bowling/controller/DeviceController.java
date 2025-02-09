@@ -67,7 +67,7 @@ public class DeviceController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{serial}/frame/{frameNum}/video")
+    @PostMapping("/{serial}/frame/{frameNum}/video")
     public ResponseEntity<?> uploadVideo(
             @PathVariable String serial,
             @PathVariable Integer frameNum,
