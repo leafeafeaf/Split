@@ -51,6 +51,21 @@ public class UserController {
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }
+    @PatchMapping("/highlight")  // PUT에서 PATCH로 변경
+    public ResponseEntity<ErrorResponse> updateHighlight(
+            @RequestHeader("Authorization") String userId,
+            @Valid @RequestBody HighlightRequest request) {
+
+        userService.updateHighlight(Integer.parseInt(userId), request.getHighlight());
+
+        return ResponseEntity.ok(ErrorResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("Highlight updated successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
+
 
 
 }
