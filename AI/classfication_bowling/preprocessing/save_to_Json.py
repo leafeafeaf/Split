@@ -38,3 +38,22 @@ def save_to_json(dataset, output_file="C:\\Users\\SSAFY\\code\\PJT\\S12P11B202\\
     print(f"✅ Data appended to {output_file}")
 
 
+def save_skel_to_json(skel_output,skel_output_folder,skel_frame_idx,):
+    skel_filename = os.path.join(skel_output_folder, f'skel_data_{skel_frame_idx:03d}.json')
+    os.makedirs(os.path.dirname(skel_filename), exist_ok=True)  # 폴더 없으면 생성
+
+    # numpy 데이터 변환 (float32 → float)
+    def convert_numpy(obj):
+        if isinstance(obj, np.ndarray):  # numpy 배열이면 리스트로 변환
+            return obj.tolist()
+        elif isinstance(obj, np.float32) or isinstance(obj, np.float64):  # float32, float64를 float으로 변환
+            return float(obj)
+        elif isinstance(obj, np.int32) or isinstance(obj, np.int64):  # int32, int64를 int로 변환
+            return int(obj)
+        return obj  # 다른 타입은 그대로 반환
+    
+    # JSON 파일 저장 (변환 적용)
+    with open(skel_filename, "w", encoding="utf-8") as f:
+        json.dump(skel_output, f, indent=4, default=convert_numpy)
+
+    print(f"✅ Data appended to {skel_filename}")

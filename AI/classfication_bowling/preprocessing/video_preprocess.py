@@ -4,6 +4,8 @@ import tensorflow as tf
 import numpy as np
 import os
 from preprocessing.labeling import labeling
+import json
+from preprocessing.save_to_Json import save_skel_to_json
 
 def process_videos(input_folder, output_folder, fps=30):
     cnt = 1
@@ -26,15 +28,42 @@ def process_videos(input_folder, output_folder, fps=30):
         # 프레임을 저장할 리스트 초기화
         frames = []
 
+
+        #---------------유사도 판단 데이터 저장장-------------
+        video_idx = 1
+        # 'similar' 폴더 안에 'image_data' 폴더 경로 설정
+        output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','image_data',f"image_data_{video_idx}")
+        output_folder = os.path.abspath(output_folder)
+        skel_output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','skel_data',f"skel_data_{video_idx}")
+        skel_output_folder = os.path.abspath(skel_output_folder)
+        
+        video_idx +=1
+
+        # 폴더가 없으면 생성
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+        
+        #---------------------------------------------------
+
         # 비디오의 모든 프레임을 읽기
+        frame_idx = 0
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
                 break
+            
             # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
-            frame = cv2.resize(frame,(640,640))
+            frame = cv2.resize(frame, (640, 640))  # 프레임 크기 조정
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            
+            # 프레임을 리스트에 저장
             frames.append(frame)
+            
+            # 각 프레임을 이미지 파일로 저장 (프레임 번호를 파일명에 추가) ---- 유사도 판단단
+            frame_filename = os.path.join(output_folder, f'frame_{frame_idx:03d}.jpg')
+            cv2.imwrite(frame_filename, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 다시 BGR로 변환하여 저장
+
+            frame_idx += 1
 
         # 비디오 캡처 객체 해제
         cap.release()
@@ -67,6 +96,7 @@ def process_videos(input_folder, output_folder, fps=30):
 
         # 한 동영상의 frame별 keypoint좌표를 저장할 리스트
         
+        skel_frame_idx = 0
         # bar = display(progress(0, num_frames-1), display_id=True)
         for frame_idx in range(num_frames):
             keypoint_dataset = [] # keypoint 좌표가 들어가는 배열
@@ -98,7 +128,18 @@ def process_videos(input_folder, output_folder, fps=30):
         print(f"skel_per_video : {skel_per_video}")
         print(f"skel_per_video_len : {len(skel_per_video)}")
 
-        labeling(video_file,skel_per_video)
+        skel_output = {
+            'keypoints': skel_per_video
+        }
+
+        skel_frame_idx += 1
+
+        # 스켈레톤 데이터 저장 ----- 유사도 판단단
+        save_skel_to_json(skel_output,skel_output_folder,skel_frame_idx)
+        
+        
+        
+        # labeling(video_file,skel_per_video)
 
         # skel_dataset.append(skel_per_video)
 

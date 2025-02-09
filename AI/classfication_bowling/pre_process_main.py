@@ -11,7 +11,7 @@ os.environ["TF_GPU_ALLOCATOR"] = "cuda_malloc_async"
 print(device)
 
 # 입력 폴더와 출력 폴더 경로 설정
-input_folder = "C:\\Users\\SSAFY\\Videos\\Movavi Library\\bw"
+input_folder = "C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\oCam\\bawling_x"
 output_folder = "C:\\Users\\SSAFY\\Documents\\output"
 
 # # 모든 하위 폴더 포함하여 처리
