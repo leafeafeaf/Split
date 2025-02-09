@@ -1,12 +1,15 @@
 package com.ssafy.Split.domain.user.service;
 
+import com.ssafy.Split.domain.user.domain.dto.request.SignupRequestDto;
 import com.ssafy.Split.domain.user.domain.entity.User;
 import com.ssafy.Split.domain.user.repository.UserRepository;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
 import com.ssafy.Split.global.infra.s3.S3Service;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final BCryptPasswordEncoder passwordEncoder;
 
 
     public void deleteHighlight(Integer userId) {
@@ -64,5 +68,28 @@ public class UserService {
         return url != null &&
                 url.startsWith("s3://split-bucket-first-1/") &&
                 (url.endsWith(".mov") || url.endsWith(".mp4"));
+    }
+
+    public void signupUser(@Valid SignupRequestDto signupRequest) {
+        //TODO 응답 및 에러 형식 수정 필요
+
+        if (userRepository.existsByEmail(signupRequest.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+
+        // 2️⃣ 비밀번호 암호화
+        String encryptedPassword = passwordEncoder.encode(signupRequest.getPassword());
+
+        // 3️⃣ 유저 엔티티 생성
+        User user = User.builder()
+                .email(signupRequest.getEmail())
+                .password(encryptedPassword) // 🔒 암호화된 비밀번호 저장
+                .nickname(signupRequest.getNickname())
+                .gender(signupRequest.getGender())
+                .height(signupRequest.getHeight()) // 선택 입력 (null 가능)
+                .build();
+
+        // 4️⃣ 유저 저장
+        userRepository.save(user);
     }
 }

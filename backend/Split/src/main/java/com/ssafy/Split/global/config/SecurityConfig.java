@@ -1,8 +1,11 @@
 package com.ssafy.Split.global.config;
 
+import com.ssafy.Split.global.common.util.JWTUtil;
+import com.ssafy.Split.global.filter.JWTFilter;
 import com.ssafy.Split.global.filter.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -20,14 +23,15 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import java.util.Collections;
 
 @Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
-
-    @Autowired
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
-        this.authenticationConfiguration = authenticationConfiguration;
-    }
+    private final JWTUtil jwtUtil;
+    @Value("${spring.jwt.access.expire-time}")
+    private long accessTime;
+    @Value("${spring.jwt.refresh.expire-time}")
+    private long refreshTime;
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -92,9 +96,9 @@ public class SecurityConfig {
                 // 기타 모든 요청은 인증 필요
                 .anyRequest().authenticated());
         //필터 적용
-        //http.addFilterBefore(new JWTFilter(jwtUtil),LoginFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil),LoginFilter.class);
         //원래있던 로그인필터 자리에 새롭게 커스텀한 로그인 필터를 넣어라
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
         //http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshService), LogoutFilter.class);
         //세션 설정
         http.sessionManagement((session) -> session
