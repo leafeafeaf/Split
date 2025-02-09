@@ -57,7 +57,7 @@ public class FrameController {
 
     }
 
-    @GetMapping("/{serialNumber}/frames")
+    @GetMapping("/{serialNumber}/frame")
     public ResponseEntity<FrameListResponse> getAllFrames(
             @PathVariable Integer serialNumber
     ) {
