@@ -2,6 +2,7 @@ package com.ssafy.Split.domain.user.controller;
 
 import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
 import com.ssafy.Split.domain.user.domain.dto.request.SignupRequestDto;
+import com.ssafy.Split.domain.user.domain.dto.request.ThemaRequest;
 import com.ssafy.Split.domain.user.service.UserService;
 import com.ssafy.Split.global.common.exception.ErrorResponse;
 import com.ssafy.Split.global.common.response.ApiResponse;
@@ -68,6 +69,34 @@ public class UserController {
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }
+    @PatchMapping("/highlight")  // PUT에서 PATCH로 변경
+    public ResponseEntity<ErrorResponse> updateHighlight(
+            @RequestHeader("Authorization") String userId,
+            @Valid @RequestBody HighlightRequest request) {
 
+        userService.updateHighlight(Integer.parseInt(userId), request.getHighlight());
+
+        return ResponseEntity.ok(ErrorResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("Highlight updated successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
+
+    @PatchMapping("/thema")  // PATCH 메서드 사용
+    public ResponseEntity<ApiResponse> updateThema(
+            @RequestHeader("Authorization") String userId,  // 임시로 userId로 사용
+            @Valid @RequestBody ThemaRequest request) {
+
+        userService.updateThema(Integer.parseInt(userId), request.getValidThema());
+
+        return ResponseEntity.ok(ApiResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("put thema successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
 
 }

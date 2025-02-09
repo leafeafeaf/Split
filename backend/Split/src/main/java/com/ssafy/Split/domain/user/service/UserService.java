@@ -63,10 +63,37 @@ public class UserService {
 
 
     }
+    public void updateHighlight(Integer userId, String highlight) {
+        // URL 형식 검증
+        if (!isValidVideoUrl(highlight)) {
+            throw new SplitException(ErrorCode.INVALID_VIDEO_URL);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
+
+        // 기존 하이라이트가 없는 경우
+        if (user.getHighlight() == null || user.getHighlight().isEmpty()) {
+            throw new SplitException(ErrorCode.HIGHLIGHT_NOT_FOUND);
+        }
+
+        user.updateHighlight(highlight);
+        userRepository.save(user);
+
+        log.info("Highlight updated for user {}: {}", userId, highlight);
+    }
+    /** 테마 변경 **/
+    public void updateThema(Integer userId, Integer thema) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
+
+        user.updateThema(thema);
+        log.info("User {} thema updated to {}", userId, thema);
+    }
 
     private boolean isValidVideoUrl(String url) {
         return url != null &&
-                url.startsWith("s3://split-bucket-first-1/") &&
+                url.startsWith("https://split-bucket-first-1.s3.ap-northeast-2.amazonaws.com/") &&
                 (url.endsWith(".mov") || url.endsWith(".mp4"));
     }
 

@@ -32,6 +32,7 @@ public enum ErrorCode {
     //highlight
     INVALID_VIDEO_URL(400, "H001", "Invalid video URL format"),
     HIGHLIGHT_ALREADY_EXISTS(400, "H002", "Highlight already exists for this user"),
+    HIGHLIGHT_NOT_FOUND(404, "H003", "Highlight not found for this user"),
 
     //s3
     S3_DELETE_ERROR(500, "S001", "Error deleting file from S3"),
