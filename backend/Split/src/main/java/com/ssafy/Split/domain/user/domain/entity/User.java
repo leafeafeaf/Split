@@ -80,4 +80,7 @@ public class User {
     public void updateHighlight(String highlight) {
         this.highlight = highlight;
     }
+    public void createHighlight(String highlight) {
+        this.highlight = highlight;
+    }
 }

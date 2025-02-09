@@ -37,4 +37,32 @@ public class UserService {
 
         }
     }
+
+    public void createHighlight(Integer userId, String highlight) {
+        // URL 형식 검증
+        if (!isValidVideoUrl(highlight)) {
+            throw new SplitException(ErrorCode.INVALID_VIDEO_URL);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
+
+        // 하이라이트가 이미 존재하는 경우
+        if (user.getHighlight() != null && !user.getHighlight().isEmpty()) {
+            throw new SplitException(ErrorCode.HIGHLIGHT_ALREADY_EXISTS);
+        }
+
+        user.createHighlight(highlight);
+        userRepository.save(user);
+
+        log.info("Highlight created for user {}: {}", userId, highlight);
+
+
+    }
+
+    private boolean isValidVideoUrl(String url) {
+        return url != null &&
+                url.startsWith("s3://split-bucket-first-1/") &&
+                (url.endsWith(".mov") || url.endsWith(".mp4"));
+    }
 }

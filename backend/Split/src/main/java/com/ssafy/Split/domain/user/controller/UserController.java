@@ -1,7 +1,10 @@
 package com.ssafy.Split.domain.user.controller;
 
+import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
 import com.ssafy.Split.domain.user.service.UserService;
+import com.ssafy.Split.global.common.exception.ErrorResponse;
 import com.ssafy.Split.global.common.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
@@ -29,6 +32,22 @@ public class UserController {
                 .code("SUCCESS")
                 .status(200)
                 .message("Highlight video deleted successfully")
+                .timestamp(LocalDateTime.now().toString())
+                .build());
+    }
+    //TODO 지금은 userId를 직접 받지만, 나중에 JWT 구현시 토큰에서 userId를 추출하도록 수정 필요
+    /** 하이라이트 등록 **/
+    @PostMapping("/highlight")
+    public ResponseEntity<ErrorResponse> createHighlight(
+            @RequestHeader("Authorization") String userId,
+            @Valid @RequestBody HighlightRequest request) {
+
+        userService.createHighlight(Integer.parseInt(userId), request.getHighlight());
+
+        return ResponseEntity.ok(ErrorResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("Highlight created successfully")
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }

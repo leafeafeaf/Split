@@ -29,6 +29,10 @@ public enum ErrorCode {
     //user
     USER_NOT_FOUND(404, "U001", "User not found with id: %s"),
 
+    //highlight
+    INVALID_VIDEO_URL(400, "H001", "Invalid video URL format"),
+    HIGHLIGHT_ALREADY_EXISTS(400, "H002", "Highlight already exists for this user"),
+
     //s3
     S3_DELETE_ERROR(500, "S001", "Error deleting file from S3"),
     INVALID_FILE_URL(400, "S002", "Invalid file URL format");
