@@ -62,7 +62,7 @@ public class UserService {
 
     private boolean isValidVideoUrl(String url) {
         return url != null &&
-                url.startsWith("s3://split-bucket-first-1/") &&
+                url.startsWith("https://split-bucket-first-1.s3.ap-northeast-2.amazonaws.com/") &&
                 (url.endsWith(".mov") || url.endsWith(".mp4"));
     }
 }
