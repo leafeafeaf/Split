@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -43,11 +42,14 @@ public class UserController {
         return ResponseEntity.ok("회원가입 성공!");
     }
 
+    /** 하이라이트 삭제 **/
     @DeleteMapping("/highlight")
-    public ResponseEntity<ApiResponse> deleteHighlight(
-            @RequestHeader("Authorization") String userId) {  // 임시로 userId로 사용, 나중에 토큰으로 변경 필요
+    public ResponseEntity<ApiResponse> deleteHighlight() {
 
-        userService.deleteHighlight(Integer.parseInt(userId));
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        int userId = userDetails.getUser().getId();
+        userService.deleteHighlight(userId);
 
         return ResponseEntity.ok(ApiResponse.builder()
                 .code("SUCCESS")
@@ -56,14 +58,16 @@ public class UserController {
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }
-    //TODO 지금은 userId를 직접 받지만, 나중에 JWT 구현시 토큰에서 userId를 추출하도록 수정 필요
+
     /** 하이라이트 등록 **/
     @PostMapping("/highlight")
     public ResponseEntity<ErrorResponse> createHighlight(
-            @RequestHeader("Authorization") String userId,
             @Valid @RequestBody HighlightRequest request) {
 
-        userService.createHighlight(Integer.parseInt(userId), request.getHighlight());
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        int userId = userDetails.getUser().getId();
+        userService.createHighlight(userId, request.getHighlight());
 
         return ResponseEntity.ok(ErrorResponse.builder()
                 .code("SUCCESS")
@@ -72,12 +76,16 @@ public class UserController {
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }
-    @PatchMapping("/highlight")  // PUT에서 PATCH로 변경
+
+    /** 하이라이트 수정 **/
+    @PatchMapping("/highlight")
     public ResponseEntity<ErrorResponse> updateHighlight(
-            @RequestHeader("Authorization") String userId,
             @Valid @RequestBody HighlightRequest request) {
 
-        userService.updateHighlight(Integer.parseInt(userId), request.getHighlight());
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+        int userId = userDetails.getUser().getId();
+        userService.updateHighlight(userId, request.getHighlight());
 
         return ResponseEntity.ok(ErrorResponse.builder()
                 .code("SUCCESS")
@@ -87,7 +95,8 @@ public class UserController {
                 .build());
     }
 
-    @PatchMapping("/thema")  // PATCH 메서드 사용
+    /** 테마 수정 **/
+    @PatchMapping("/thema")
     public ResponseEntity<ApiResponse> updateThema(
             @Valid @RequestBody ThemaRequest request) {
         CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
@@ -104,5 +113,4 @@ public class UserController {
                 .timestamp(LocalDateTime.now().toString())
                 .build());
     }
-
 }
