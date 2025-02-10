@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@IdClass(RankId.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "game_rank")
 public class Rank {
@@ -22,6 +23,7 @@ public class Rank {
     @JoinColumn(name = "game_id")
     private Game game;
 
+    @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
