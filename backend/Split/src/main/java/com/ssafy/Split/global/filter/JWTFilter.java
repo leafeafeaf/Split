@@ -1,8 +1,8 @@
 package com.ssafy.Split.global.filter;
 
-import com.ssafy.Split.domain.user.domain.dto.CustomUserDetails;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.domain.user.domain.entity.User;
-import com.ssafy.Split.global.common.util.JWTUtil;
+import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;

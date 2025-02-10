@@ -1,4 +1,4 @@
-package com.ssafy.Split.global.common.util;
+package com.ssafy.Split.global.common.JWT.util;
 
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;

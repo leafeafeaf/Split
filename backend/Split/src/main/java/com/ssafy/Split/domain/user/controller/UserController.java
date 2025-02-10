@@ -1,6 +1,6 @@
 package com.ssafy.Split.domain.user.controller;
 
-import com.ssafy.Split.domain.user.domain.dto.CustomUserDetails;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
 import com.ssafy.Split.domain.user.domain.dto.request.SignupRequestDto;
 import com.ssafy.Split.domain.user.domain.dto.request.ThemaRequest;
@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;

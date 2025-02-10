@@ -1,7 +1,8 @@
 package com.ssafy.Split.global.filter;
 
-import com.ssafy.Split.domain.user.domain.dto.CustomUserDetails;
-import com.ssafy.Split.global.common.util.JWTUtil;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
+import com.ssafy.Split.global.common.JWT.service.RefreshService;
+import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
+    private final RefreshService refreshService;
     private final JWTUtil jwtUtil;
     private long accessTime;
     private long refreshTime;
@@ -49,18 +51,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //log.info(data.getUsername()+" "+data.getName());
         //토큰 생성
         log.info(accessTime+" "+refreshTime);
-//
+
         String access = jwtUtil.createJwt("access",id,email,nickname,accessTime);
         String refresh = jwtUtil.createJwt("refresh",id,email,nickname,refreshTime);
 
         //DB에 Refresh토큰 저장
-//        refreshService.deleteByMemberId(id);
-//        refreshService.addRefreshEntity(id,refresh,refreshTime);
+        refreshService.deleteByMemberId(id);
+        refreshService.addRefreshEntity(id,refresh,refreshTime);
 
         response.setHeader("Authorization",access);
 
         //refresh 토큰 HTTPONLY 쿠키로 브라우저로 전송
-//        response.addCookie(jwtUtil.createCookie("refresh",refresh));
+        response.addCookie(jwtUtil.createCookie("refresh",refresh));
         response.setStatus(HttpStatus.OK.value());
     }
 

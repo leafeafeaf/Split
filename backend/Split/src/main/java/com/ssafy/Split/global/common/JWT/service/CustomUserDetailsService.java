@@ -1,8 +1,8 @@
-package com.ssafy.Split.domain.user.service;
+package com.ssafy.Split.global.common.JWT.service;
 
 import com.ssafy.Split.domain.user.domain.entity.User;
 import com.ssafy.Split.domain.user.repository.UserRepository;
-import com.ssafy.Split.domain.user.domain.dto.CustomUserDetails;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

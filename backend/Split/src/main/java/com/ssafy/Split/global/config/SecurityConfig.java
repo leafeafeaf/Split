@@ -1,6 +1,7 @@
 package com.ssafy.Split.global.config;
 
-import com.ssafy.Split.global.common.util.JWTUtil;
+import com.ssafy.Split.global.common.JWT.service.RefreshService;
+import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import com.ssafy.Split.global.filter.JWTFilter;
 import com.ssafy.Split.global.filter.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,6 +29,7 @@ import java.util.Collections;
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final RefreshService refreshService;
     @Value("${spring.jwt.access.expire-time}")
     private long accessTime;
     @Value("${spring.jwt.refresh.expire-time}")
@@ -98,7 +100,7 @@ public class SecurityConfig {
         //필터 적용
         http.addFilterBefore(new JWTFilter(jwtUtil),LoginFilter.class);
         //원래있던 로그인필터 자리에 새롭게 커스텀한 로그인 필터를 넣어라
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),refreshService,jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
         //http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshService), LogoutFilter.class);
         //세션 설정
         http.sessionManagement((session) -> session
