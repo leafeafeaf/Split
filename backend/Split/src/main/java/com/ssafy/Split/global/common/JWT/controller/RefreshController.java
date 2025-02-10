@@ -23,7 +23,6 @@ public class RefreshController {
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request,HttpServletResponse response) throws Exception {
 
-        //TODO 에러 메시지 정형화 필요
         String refreshToken = jwtUtil.getCookieValue(request, "refresh")
                     .orElseThrow(() -> new SplitException(ErrorCode.TOKEN_MISSING,"refresh"));
 

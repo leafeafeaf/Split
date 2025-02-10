@@ -19,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class JWTUtil {
-    private SecretKey secretKey;
+    private final SecretKey secretKey;
 
     @Value("${spring.jwt.access.expire-time}")
     private long accessTime;
@@ -82,18 +82,7 @@ public class JWTUtil {
             throw handleJwtException(e);
         }
     }
-    public String getExpiredTime(String token) {
-        try {
-            return String.valueOf(Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration());
-        } catch (JwtException e) {
-            throw handleJwtException(e);
-        }
-    }
+
     public boolean isExpired(String token) {
         try {
             return Jwts.parser()
