@@ -1,6 +1,6 @@
 package com.ssafy.Split.global.common.JWT.controller;
 
-import com.ssafy.Split.global.common.JWT.service.RefreshService;
+import com.ssafy.Split.global.common.JWT.service.JWTService;
 import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @RestController
 @AllArgsConstructor
 public class RefreshController {
-    private final RefreshService refreshService;
+    private final JWTService JWTService;
     private final JWTUtil jwtUtil;
 
     @PostMapping("/reissue")
@@ -27,7 +27,7 @@ public class RefreshController {
         String refreshToken = jwtUtil.getCookieValue(request, "refresh")
                     .orElseThrow(() -> new SplitException(ErrorCode.TOKEN_MISSING,"refresh"));
 
-            String token = refreshService.reissue(refreshToken,response);
+            String token = JWTService.reissue(refreshToken,response);
 
             return ResponseEntity.ok().header("Authorization", token).
                     body(ApiResponse.builder()

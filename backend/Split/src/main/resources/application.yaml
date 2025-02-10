@@ -4,9 +4,9 @@ server:
 spring:
   jwt:
     access:
-      expire-time: 10000 # 1800000
+      expire-time: 1800000
     refresh:
-      expire-time: 60000 # 86400000
+      expire-time: 86400000
     secret: ${SPRING_JWT_SECRET}
   redis:
     host: ${SPRING_REDIS_HOST:localhost}

@@ -1,7 +1,7 @@
 package com.ssafy.Split.global.filter;
 
 import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
-import com.ssafy.Split.global.common.JWT.service.RefreshService;
+import com.ssafy.Split.global.common.JWT.service.JWTService;
 import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
@@ -24,7 +24,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final RefreshService refreshService;
+    private final JWTService JWTService;
     private final JWTUtil jwtUtil;
     private long accessTime;
     private long refreshTime;
@@ -43,9 +43,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         CustomUserDetails data = (CustomUserDetails) authResult.getPrincipal();
 
-        //TODO refresh토큰 개발 필요
-
-        //로그인 정보를 바탕으로
         int id = data.getUser().getId();
         String email = data.getUser().getEmail();
         String nickname = data.getUser().getNickname();
@@ -59,9 +56,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .orElse(null);
 
         if (pastRefresh != null && !pastRefresh.isEmpty()) {
-            refreshService.deleteRefreshToken(pastRefresh);
+            JWTService.deleteRefreshToken(pastRefresh);
         }
-        refreshService.addRefreshEntity(id, refresh);
+        JWTService.addRefreshEntity(id, refresh);
 
         response.setHeader("Authorization", access);
         response.addCookie(jwtUtil.createCookie("refresh", refresh));

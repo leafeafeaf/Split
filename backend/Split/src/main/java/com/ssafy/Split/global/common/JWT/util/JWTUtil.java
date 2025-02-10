@@ -5,6 +5,7 @@ import com.ssafy.Split.global.common.exception.SplitException;
 import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
+@Slf4j
 @Component
 public class JWTUtil {
     private SecretKey secretKey;
@@ -80,8 +82,19 @@ public class JWTUtil {
             throw handleJwtException(e);
         }
     }
-
-    public Boolean isExpired(String token) {
+    public String getExpiredTime(String token) {
+        try {
+            return String.valueOf(Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration());
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
+    }
+    public boolean isExpired(String token) {
         try {
             return Jwts.parser()
                     .verifyWith(secretKey)
@@ -105,16 +118,23 @@ public class JWTUtil {
     }
 
     public String createJwt(String category, int id, String email, String nickname, Long expiredMs) {
+        long currentTime = System.currentTimeMillis();
+        long expirationTime = currentTime + expiredMs;
+
+        log.info(currentTime + " curr time");
+        log.info(expirationTime + " expire time");
+
         return Jwts.builder()
                 .claim("category", category)
                 .claim("id", id)
                 .claim("email", email)
                 .claim("nickname", nickname)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiredMs))
+                .issuedAt(new Date(currentTime))
+                .expiration(new Date(expirationTime))
                 .signWith(secretKey)
                 .compact();
     }
+
 
     public Optional<String> getCookieValue(HttpServletRequest request, String cookieName) {
         if (request.getCookies() == null) return Optional.empty();
@@ -126,6 +146,8 @@ public class JWTUtil {
     }
 
     private SplitException handleJwtException(JwtException e) {
+        log.error(e.getMessage());
+
         if (e instanceof ExpiredJwtException) {
             return new SplitException(ErrorCode.TOKEN_EXPIRED);
         } else if (e instanceof MalformedJwtException) {

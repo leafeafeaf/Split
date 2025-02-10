@@ -17,10 +17,11 @@ public enum ErrorCode {
     UNAUTHORIZED(401, "C003", "인증되지 않은 접근입니다."),
 
     // Token
-    TOKEN_EXPIRED(401,"T001","Access token has expired"),
+    TOKEN_EXPIRED(401,"T001","token has expired"),
     INVALID_TOKEN(401,"T002","Invalid token format or signature"),
     TOKEN_MISSING(401,"T003","%s token is missing"),
     TOKEN_ERROR(401,"T004","Token validation error"),
+    UNREGISTERED_TOKEN(401, "T005", "Token is not registered in the system"),
 
     //Permission
     FORBIDDEN_ACCESS(403, "P001", "Forbidden: You do not have permission to access this resource"),
