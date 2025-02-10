@@ -101,6 +101,7 @@ def process_videos(input_folder, output_folder, fps=30):
         for frame_idx in range(num_frames):
             keypoint_dataset = [] # keypoint 좌표가 들어가는 배열
             # print(frame_idx)
+            
             keypoints_with_scores = run_inference(
             movenet, image[frame_idx, :, :, :], crop_region,
             crop_size=[input_size, input_size])
@@ -168,6 +169,7 @@ def process_video_infer(video_path, output_folder, fps=30):
         if not ret:
             break
         # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
+        # frame = cv2.resize(frame,(640,640))
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frames.append(frame)
 
@@ -228,7 +230,8 @@ def process_video_infer(video_path, output_folder, fps=30):
         )
 
     
-    return skel_dataset, output_images
+    return skel_dataset, output_images, num_frames
+
 
 def to_mp4(images, fps, input_file_path, output_folder):
     print("IN to_mp4 --- ")
