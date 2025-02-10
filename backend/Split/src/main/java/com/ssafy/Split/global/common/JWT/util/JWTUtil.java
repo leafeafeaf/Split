@@ -1,14 +1,19 @@
 package com.ssafy.Split.global.common.JWT.util;
 
-import io.jsonwebtoken.Jwts;
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
+import io.jsonwebtoken.*;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JWTUtil {
@@ -24,24 +29,70 @@ public class JWTUtil {
     }
 
     public String getEmail(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("email", String.class);
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("email", String.class);
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
     }
 
     public String getNickname(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("nickname", String.class);
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("nickname", String.class);
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
     }
+
     public int getId(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Integer.class);
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("id", Integer.class);
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
     }
 
 
     public String getCategory(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token)
-                .getPayload().get("category", String.class);
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("category", String.class);
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
     }
 
     public Boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+        try {
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getExpiration()
+                    .before(new Date());
+        } catch (JwtException e) {
+            throw handleJwtException(e);
+        }
     }
 
     public Cookie createCookie(String key, String value) {
@@ -53,15 +104,36 @@ public class JWTUtil {
         return cookie;
     }
 
-    public String createJwt(String category, int id ,String email, String nickname, Long expiredMs) {
+    public String createJwt(String category, int id, String email, String nickname, Long expiredMs) {
         return Jwts.builder()
                 .claim("category", category)
-                .claim("id",id)
+                .claim("id", id)
                 .claim("email", email)
                 .claim("nickname", nickname)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public Optional<String> getCookieValue(HttpServletRequest request, String cookieName) {
+        if (request.getCookies() == null) return Optional.empty();
+
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> cookie.getName().equals(cookieName))
+                .map(Cookie::getValue)
+                .findFirst();
+    }
+
+    private SplitException handleJwtException(JwtException e) {
+        if (e instanceof ExpiredJwtException) {
+            return new SplitException(ErrorCode.TOKEN_EXPIRED);
+        } else if (e instanceof MalformedJwtException) {
+            return new SplitException(ErrorCode.INVALID_TOKEN);
+        } else if (e instanceof UnsupportedJwtException) {
+            return new SplitException(ErrorCode.INVALID_TOKEN);
+        } else {
+            return new SplitException(ErrorCode.TOKEN_ERROR);
+        }
     }
 }

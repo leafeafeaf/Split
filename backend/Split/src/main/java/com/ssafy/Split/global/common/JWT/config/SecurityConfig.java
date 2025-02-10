@@ -1,7 +1,10 @@
-package com.ssafy.Split.global.config;
+package com.ssafy.Split.global.common.JWT.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.Split.global.common.JWT.config.handler.CustomAuthenticationEntryPoint;
 import com.ssafy.Split.global.common.JWT.service.RefreshService;
 import com.ssafy.Split.global.common.JWT.util.JWTUtil;
+import com.ssafy.Split.global.filter.ExceptionFilter;
 import com.ssafy.Split.global.filter.JWTFilter;
 import com.ssafy.Split.global.filter.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,10 +33,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshService refreshService;
+    private final ObjectMapper objectMapper;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Value("${spring.jwt.access.expire-time}")
     private long accessTime;
     @Value("${spring.jwt.refresh.expire-time}")
     private long refreshTime;
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -63,7 +70,9 @@ public class SecurityConfig {
                 return configuration;
             }
         }));
-
+        http.exceptionHandling(ex ->
+                ex.authenticationEntryPoint(customAuthenticationEntryPoint) // ✅ 인증 실패 시 403 JSON 응답 반환
+        );
         //csrf disable, 세션을 stateless상태로 관리하기 때문에 csrf 공격에 덜 취약함
         http.csrf((auth) -> auth.disable());
         //Form 로그인 방식 disable
@@ -97,11 +106,15 @@ public class SecurityConfig {
 
                 // 기타 모든 요청은 인증 필요
                 .anyRequest().authenticated());
+
         //필터 적용
         http.addFilterBefore(new JWTFilter(jwtUtil),LoginFilter.class);
+        http.addFilterBefore(new ExceptionFilter(objectMapper), JWTFilter.class);
+
         //원래있던 로그인필터 자리에 새롭게 커스텀한 로그인 필터를 넣어라
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),refreshService,jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
         //http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshService), LogoutFilter.class);
+
         //세션 설정
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

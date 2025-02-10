@@ -3,6 +3,8 @@ package com.ssafy.Split.global.filter;
 import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.global.common.JWT.service.RefreshService;
 import com.ssafy.Split.global.common.JWT.util.JWTUtil;
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +33,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String email = request.getParameter("email");
         String password = obtainPassword(request);
 
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email,password,null);
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(email, password, null);
         //자동으로 CustomUserDetailsService 호출
         return authenticationManager.authenticate(authToken);
     }
@@ -48,29 +50,27 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String email = data.getUser().getEmail();
         String nickname = data.getUser().getNickname();
 
-        //log.info(data.getUsername()+" "+data.getName());
-        //토큰 생성
-        log.info(accessTime+" "+refreshTime);
+        //새 토큰 생성
+        String access = jwtUtil.createJwt("access", id, email, nickname, accessTime);
+        String refresh = jwtUtil.createJwt("refresh", id, email, nickname, refreshTime);
 
-        String access = jwtUtil.createJwt("access",id,email,nickname,accessTime);
-        String refresh = jwtUtil.createJwt("refresh",id,email,nickname,refreshTime);
+        //기존 리프레시 토큰 삭제
+        String pastRefresh = jwtUtil.getCookieValue(request, "refresh")
+                .orElse(null);
 
-        //DB에 Refresh토큰 저장
-        refreshService.deleteByMemberId(id);
-        refreshService.addRefreshEntity(id,refresh,refreshTime);
+        if (pastRefresh != null && !pastRefresh.isEmpty()) {
+            refreshService.deleteRefreshToken(pastRefresh);
+        }
+        refreshService.addRefreshEntity(id, refresh);
 
-        response.setHeader("Authorization",access);
-
-        //refresh 토큰 HTTPONLY 쿠키로 브라우저로 전송
-        response.addCookie(jwtUtil.createCookie("refresh",refresh));
+        response.setHeader("Authorization", access);
+        response.addCookie(jwtUtil.createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
     }
 
     //로그인 실패
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-//        log.info("fail");
-        //TODO 전역 에러 처리를 할 수 있도록 앞단에서 처리해줘야함
-        response.setStatus(401);
+        throw new SplitException(ErrorCode.INVALID_CREDENTIALS);
     }
 }
