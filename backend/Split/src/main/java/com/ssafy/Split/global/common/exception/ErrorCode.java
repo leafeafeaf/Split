@@ -11,7 +11,7 @@ public enum ErrorCode {
    */
 
   // Common Error Codes
-  INVALID_INPUT_VALUE(400, "C001", "잘못된 입력값입니다."),
+  INVALID_INPUT_VALUE(400, "C001", "잘못된 입력값입니다. (%s)"),
   INTERNAL_SERVER_ERROR(500, "C002", "서버 오류가 발생했습니다."),
   UNAUTHORIZED(401, "C003", "인증되지 않은 접근입니다."),
 
@@ -43,6 +43,7 @@ public enum ErrorCode {
   USER_NOT_FOUND(404, "U001", "User not found with id: %s"),
   INVALID_CREDENTIALS(401, "U002", "Invalid email or password"),
   USER_MISMATCH(403, "U003", "Registered user information does not match the current login"),
+  USER_ALREADY_EXISTS(409, "U004", "%s already exists: %s"),
 
   //highlight
   INVALID_VIDEO_URL(400, "H001", "Invalid video URL format"),

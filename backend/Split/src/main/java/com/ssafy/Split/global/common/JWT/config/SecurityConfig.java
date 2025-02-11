@@ -92,6 +92,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/device/{serial}/frame").permitAll()
                 .requestMatchers(HttpMethod.POST, "/device/{serial}/frame").permitAll()
                 .requestMatchers(HttpMethod.POST, "/device/{serial}/frame/{framenum}/video").permitAll()
+                .requestMatchers(HttpMethod.GET, "/user/check-nickname/{nickname}").permitAll()
 
                 // 🔹 인증 필요 (YES)
                 .requestMatchers(HttpMethod.POST, "/logout").authenticated()
