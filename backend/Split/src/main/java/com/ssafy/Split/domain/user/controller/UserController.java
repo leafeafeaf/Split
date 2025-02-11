@@ -2,7 +2,6 @@ package com.ssafy.Split.domain.user.controller;
 
 import com.ssafy.Split.domain.user.domain.dto.request.UpdateUserRequestDto;
 import com.ssafy.Split.domain.user.domain.dto.response.UserInfoResponseDto;
-import com.ssafy.Split.domain.user.domain.entity.User;
 import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
 import com.ssafy.Split.domain.user.domain.dto.request.SignupRequestDto;
