@@ -16,6 +16,16 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(500, "C002", "서버 오류가 발생했습니다."),
     UNAUTHORIZED(401, "C003", "인증되지 않은 접근입니다."),
 
+    // Token
+    TOKEN_EXPIRED(401,"T001","token has expired"),
+    INVALID_TOKEN(401,"T002","Invalid token format or signature"),
+    TOKEN_MISSING(401,"T003","%s token is missing"),
+    TOKEN_ERROR(401,"T004","Token validation error"),
+    UNREGISTERED_TOKEN(401, "T005", "Token is not registered in the system"),
+
+    //Permission
+    FORBIDDEN_ACCESS(403, "P001", "Forbidden: You do not have permission to access this resource"),
+
     // Frame
     FRAME_NOT_FOUND(404, "F001", "FRAME not found with Num: %s"),
 
@@ -28,6 +38,7 @@ public enum ErrorCode {
 
     //user
     USER_NOT_FOUND(404, "U001", "User not found with id: %s"),
+    INVALID_CREDENTIALS(401, "U002", "Invalid email or password"),
 
     //highlight
     INVALID_VIDEO_URL(400, "H001", "Invalid video URL format"),

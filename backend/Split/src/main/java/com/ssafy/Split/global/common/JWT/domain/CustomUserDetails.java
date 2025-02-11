@@ -1,4 +1,4 @@
-package com.ssafy.Split.domain.user.domain.dto;
+package com.ssafy.Split.global.common.JWT.domain;
 
 import com.ssafy.Split.domain.user.domain.entity.User;
 import lombok.Getter;

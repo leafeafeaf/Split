@@ -1,6 +1,6 @@
 package com.ssafy.Split.domain.user.controller;
 
-import com.ssafy.Split.domain.user.domain.dto.CustomUserDetails;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.domain.user.domain.dto.request.HighlightRequest;
 import com.ssafy.Split.domain.user.domain.dto.request.SignupRequestDto;
 import com.ssafy.Split.domain.user.domain.dto.request.ThemaRequest;

@@ -1,6 +1,11 @@
-package com.ssafy.Split.global.config;
+package com.ssafy.Split.global.common.JWT.config;
 
-import com.ssafy.Split.global.common.util.JWTUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.Split.global.common.JWT.config.handler.CustomAuthenticationEntryPoint;
+import com.ssafy.Split.global.common.JWT.service.JWTService;
+import com.ssafy.Split.global.common.JWT.util.JWTUtil;
+import com.ssafy.Split.global.filter.CustomLogoutFilter;
+import com.ssafy.Split.global.filter.ExceptionFilter;
 import com.ssafy.Split.global.filter.JWTFilter;
 import com.ssafy.Split.global.filter.LoginFilter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +22,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -28,10 +34,15 @@ import java.util.Collections;
 public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
+    private final JWTService JWTService;
+    private final ObjectMapper objectMapper;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Value("${spring.jwt.access.expire-time}")
     private long accessTime;
     @Value("${spring.jwt.refresh.expire-time}")
     private long refreshTime;
+
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -61,7 +72,9 @@ public class SecurityConfig {
                 return configuration;
             }
         }));
-
+        http.exceptionHandling(ex ->
+                ex.authenticationEntryPoint(customAuthenticationEntryPoint) // ✅ 인증 실패 시 403 JSON 응답 반환
+        );
         //csrf disable, 세션을 stateless상태로 관리하기 때문에 csrf 공격에 덜 취약함
         http.csrf((auth) -> auth.disable());
         //Form 로그인 방식 disable
@@ -78,7 +91,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/device/{serial}/frame/{framenum}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/device/{serial}/frame").permitAll()
                 .requestMatchers(HttpMethod.POST, "/device/{serial}/frame").permitAll()
-                .requestMatchers(HttpMethod.PUT, "/device/{serial}/frame/{framenum}/video").permitAll()
+                .requestMatchers(HttpMethod.POST, "/device/{serial}/frame/{framenum}/video").permitAll()
 
                 // 🔹 인증 필요 (YES)
                 .requestMatchers(HttpMethod.POST, "/logout").authenticated()
@@ -95,11 +108,15 @@ public class SecurityConfig {
 
                 // 기타 모든 요청은 인증 필요
                 .anyRequest().authenticated());
+
         //필터 적용
         http.addFilterBefore(new JWTFilter(jwtUtil),LoginFilter.class);
+        http.addFilterBefore(new ExceptionFilter(objectMapper), JWTFilter.class);
+
         //원래있던 로그인필터 자리에 새롭게 커스텀한 로그인 필터를 넣어라
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
-        //http.addFilterBefore(new CustomLogoutFilter(jwtUtil,refreshService), LogoutFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), JWTService,jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomLogoutFilter(JWTService), LogoutFilter.class);
+
         //세션 설정
         http.sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

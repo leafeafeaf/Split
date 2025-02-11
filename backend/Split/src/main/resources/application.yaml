@@ -8,7 +8,9 @@ spring:
     refresh:
       expire-time: 86400000
     secret: ${SPRING_JWT_SECRET}
-
+  redis:
+    host: ${SPRING_REDIS_HOST:localhost}
+    port: ${SPRING_REDIS_PORT:6379}
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url : ${SPRING_DATASOURCE_URL}
