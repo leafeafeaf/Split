@@ -6,37 +6,36 @@ import com.ssafy.Split.global.common.exception.ErrorResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    private final ObjectMapper objectMapper;
 
-    public CustomAuthenticationEntryPoint() {
-        objectMapper = new ObjectMapper();
-    }
+  private final ObjectMapper objectMapper;
 
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException) throws IOException, ServletException {
+  public CustomAuthenticationEntryPoint() {
+    objectMapper = new ObjectMapper();
+  }
 
-        response.setContentType("application/json");
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setCharacterEncoding("UTF-8");
+  @Override
+  public void commence(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException authException) throws IOException, ServletException {
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                ErrorCode.FORBIDDEN_ACCESS.getCode(),
-                ErrorCode.FORBIDDEN_ACCESS.getStatus(),
-                ErrorCode.FORBIDDEN_ACCESS.getMessage(),
-                LocalDateTime.now().toString(),
-                null
-        );
+    response.setContentType("application/json");
+    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    response.setCharacterEncoding("UTF-8");
 
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-    }
+    ErrorResponse errorResponse = new ErrorResponse(
+        ErrorCode.FORBIDDEN_ACCESS.getCode(),
+        ErrorCode.FORBIDDEN_ACCESS.getStatus(),
+        ErrorCode.FORBIDDEN_ACCESS.getMessage(),
+        LocalDateTime.now().toString()
+    );
+
+    response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+  }
 }
