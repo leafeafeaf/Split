@@ -3,7 +3,6 @@ package com.ssafy.Split.domain.bowling.controller;
 
 import com.ssafy.Split.domain.bowling.domain.dto.request.DeviceMeasurementRequest;
 import com.ssafy.Split.domain.bowling.service.DeviceService;
-import com.ssafy.Split.domain.bowling.service.FrameService;
 import com.ssafy.Split.global.common.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
@@ -24,12 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeviceController {
 
   private final DeviceService deviceService;
-  private final FrameService frameService;
 
   /**
    * 디바이스 측정 시작
    **/
-  //TODO 등록시에 현재 serial 넘버가 존재하면 측정시작이 안되게 예외처리 필요
   @PostMapping("/{serial}")
   public ResponseEntity<ApiResponse> startMeasurement(
       @PathVariable Integer serial,

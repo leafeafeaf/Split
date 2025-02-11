@@ -2,10 +2,8 @@ package com.ssafy.Split.domain.bowling.service;
 
 import com.ssafy.Split.domain.bowling.domain.dto.request.DeviceMeasurementRequest;
 import com.ssafy.Split.domain.bowling.domain.entity.Device;
-import com.ssafy.Split.domain.bowling.domain.entity.Frame;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
 import com.ssafy.Split.domain.bowling.repository.DeviceRepository;
-import com.ssafy.Split.domain.bowling.repository.FrameRepository;
 import com.ssafy.Split.domain.bowling.repository.ProgressRepository;
 import com.ssafy.Split.domain.user.domain.entity.User;
 import com.ssafy.Split.domain.user.repository.UserRepository;
@@ -26,7 +24,6 @@ public class DeviceService {
 
   private final DeviceRepository deviceRepository;
   private final ProgressRepository progressRepository;
-  private final FrameRepository frameRepository;
   private final UserRepository userRepository;
 
   @Transactional
@@ -40,8 +37,9 @@ public class DeviceService {
         .orElseThrow(
             () -> new SplitException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(serial)));
 
-    // 디바이스 사용 중 여부 확인
-    if (progressRepository.existsByDeviceSerialNumberAndStatusInProgress(serial)) {
+    // 3시간 이내의 진행 중인 Progress가 있는지 확인
+    LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
+    if (progressRepository.existsByDeviceSerialNumberAndTimeAfter(serial, threeHoursAgo)) {
       throw new SplitException(ErrorCode.DEVICE_IN_USE, String.valueOf(serial));
     }
 
@@ -60,14 +58,15 @@ public class DeviceService {
     log.info("progress : {}", progress);
     Progress savedProgress = progressRepository.save(progress);
     log.info("savedProgress : {}", savedProgress);
-
-    // Frame 생성
-    Frame frame = Frame.builder()
-        .progress(savedProgress)
-        .device(device)
-        .num(1)  // 첫 번째 프레임
-        .build();
-    log.info("frame : {}", frame);
-    frameRepository.save(frame);
+    /**
+     // Frame 생성
+     Frame frame = Frame.builder()
+     .progress(savedProgress)
+     .device(device)
+     .num(1)  // 첫 번째 프레임
+     .build();
+     log.info("frame : {}", frame);
+     frameRepository.save(frame);
+     **/
   }
 }

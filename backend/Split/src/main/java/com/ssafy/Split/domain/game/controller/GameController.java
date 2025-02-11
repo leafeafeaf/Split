@@ -30,11 +30,8 @@ public class GameController {
   private final GameService gameService;
 
   /**
-   * 게임 업로드
+   * 게임 등록
    **/
-  // TODO 게임 등록시 해당 디바이스의 프레임 테이블과 progress 테이블 삭제 필요
-  // TODO 시리얼 번호를 입력 받아야함 (GameUploadRequest에 시리얼 추가)
-  //TODO 업로드된 게임 정보 바탕으로 유저 정보 수정
   @PostMapping
   public ResponseEntity<GameUploadResponse> uploadGame(
       @Valid @RequestBody GameUploadRequest request) {

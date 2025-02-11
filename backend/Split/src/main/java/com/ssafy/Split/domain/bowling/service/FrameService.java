@@ -42,7 +42,7 @@ public class FrameService {
             () -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serial)));
 
     // 현재 프레임 번호 계산
-    Integer currentFrameNum = frameRepository.countByProgressId(progress.getId()) + 1;
+    Integer currentFrameNum = progress.getFrameCount() + 1;
 
     // Frame 생성
     Frame frame = Frame.builder()
