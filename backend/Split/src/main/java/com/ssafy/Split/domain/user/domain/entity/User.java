@@ -79,6 +79,12 @@ public class User {
   @Column(nullable = false)
   private Integer thema = 2;  // 1: 라이트, 2: 다크
 
+  @Column(name = "curr_bowling_score", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 0")
+  private Integer currBowlingScore = 0; // 최근 볼링 점수
+
+  @Column(name = "avg_bowling_score", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 0")
+  private Integer avgBowlingScore = 0; // 평균 볼링 점수
+
   @OneToMany(mappedBy = "user")
   private List<Game> games;
 
