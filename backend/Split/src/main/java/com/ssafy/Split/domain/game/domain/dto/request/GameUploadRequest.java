@@ -45,5 +45,6 @@ public class GameUploadRequest {
   @DecimalMax("100.00")
   private BigDecimal armSpeed;
 
+  private Integer bowlingScore;
 
 }

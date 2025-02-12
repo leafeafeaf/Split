@@ -63,6 +63,7 @@ public class GameService {
         .elbowAngleScore(request.getElbowAngleScore())
         .armStabilityScore(request.getArmStabilityScore())
         .armSpeed(request.getArmSpeed())
+        .bowlingScore(request.getBowlingScore())
         .build();
 
     Game savedGame = gameRepository.save(game);

@@ -3,6 +3,7 @@ package com.ssafy.Split.domain.user.domain.entity;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
 import com.ssafy.Split.domain.game.domain.entity.Game;
 import com.ssafy.Split.domain.rank.domain.entity.Rank;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -85,13 +86,13 @@ public class User {
   @Column(name = "avg_bowling_score", nullable = false, columnDefinition = "SMALLINT UNSIGNED DEFAULT 0")
   private Integer avgBowlingScore = 0; // 평균 볼링 점수
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Game> games;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Progress> progresses;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Rank> ranks;
 
 
