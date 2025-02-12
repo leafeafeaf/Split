@@ -41,6 +41,10 @@ public class FrameService {
         .orElseThrow(
             () -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serial)));
 
+    if (progress.getFrameCount() >= 10) {
+      throw new SplitException(ErrorCode.MAX_FRAME_LIMIT);
+    }
+
     // 현재 프레임 번호 계산
     Integer currentFrameNum = progress.getFrameCount() + 1;
 

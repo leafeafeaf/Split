@@ -27,6 +27,8 @@ public enum ErrorCode {
 
   // Frame
   FRAME_NOT_FOUND(404, "F001", "FRAME not found with Num: %s"),
+  MAX_FRAME_LIMIT(409, "F002", "Cannot add more frames. Maximum limit of 10 frames reached"),
+
   // Device
   DEVICE_NOT_FOUND(404, "D001", "Device not found with serial: %s"),
   DEVICE_IN_USE(409, "D002", "Device is already in use: %s"),
