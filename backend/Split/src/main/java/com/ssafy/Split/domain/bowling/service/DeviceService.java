@@ -1,6 +1,5 @@
 package com.ssafy.Split.domain.bowling.service;
 
-import com.ssafy.Split.domain.bowling.domain.dto.request.DeviceMeasurementRequest;
 import com.ssafy.Split.domain.bowling.domain.entity.Device;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
 import com.ssafy.Split.domain.bowling.repository.DeviceRepository;
@@ -27,7 +26,7 @@ public class DeviceService {
   private final UserRepository userRepository;
 
   @Transactional
-  public void startMeasurement(int serial, DeviceMeasurementRequest request) {
+  public void startMeasurement(int serial) {
     CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
         .getAuthentication().getPrincipal();
     int userId = userDetails.getUser().getId();
