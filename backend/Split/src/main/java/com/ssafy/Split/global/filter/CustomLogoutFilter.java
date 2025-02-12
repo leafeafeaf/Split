@@ -1,6 +1,8 @@
 package com.ssafy.Split.global.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.Split.global.common.JWT.service.JWTService;
+import com.ssafy.Split.global.common.response.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -11,11 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
     private final JWTService JWTService;
-
+    private final ObjectMapper objectMapper;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -35,5 +38,16 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
         JWTService.logout(request,response);
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("logout success")
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 }

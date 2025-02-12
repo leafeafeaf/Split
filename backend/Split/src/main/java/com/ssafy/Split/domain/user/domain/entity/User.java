@@ -3,6 +3,7 @@ package com.ssafy.Split.domain.user.domain.entity;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
 import com.ssafy.Split.domain.game.domain.entity.Game;
 import com.ssafy.Split.domain.rank.domain.entity.Rank;
+import com.ssafy.Split.domain.user.domain.dto.request.UpdateUserRequestDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -108,6 +109,48 @@ public class User {
     this.thema = thema;
   }
 
+  public void updateUser(User user, UpdateUserRequestDto updateRequest) {
+    if (updateRequest.getGender() != null)
+      user.setGender(updateRequest.getGender());
+
+    if (updateRequest.getHeight() != null)
+      user.setHeight(updateRequest.getHeight());
+
+    if (updateRequest.getNickname() != null)
+      user.setNickname(updateRequest.getNickname());
+
+    if (updateRequest.getTotalGameCount() != null)
+      user.setTotalGameCount(updateRequest.getTotalGameCount());
+
+    if (updateRequest.getHighlight() != null)
+      user.setHighlight(updateRequest.getHighlight());
+
+    if (updateRequest.getTotalPoseHighscore() != null)
+      user.setTotalPoseHighscore(BigDecimal.valueOf(updateRequest.getTotalPoseHighscore()));
+
+    if (updateRequest.getTotalPoseAvgscore() != null)
+      user.setTotalPoseAvgscore(BigDecimal.valueOf(updateRequest.getTotalPoseAvgscore()));
+
+    if (updateRequest.getElbowAngleScore() != null)
+      user.setElbowAngleScore(BigDecimal.valueOf(updateRequest.getElbowAngleScore()));
+
+    if (updateRequest.getArmStabilityScore() != null)
+      user.setArmStabilityScore(BigDecimal.valueOf(updateRequest.getArmStabilityScore()));
+
+    if (updateRequest.getArmSpeedScore() != null)
+      user.setArmSpeedScore(BigDecimal.valueOf(updateRequest.getArmSpeedScore()));
+
+    if (updateRequest.getThema() != null)
+      user.setThema(updateRequest.getThema());
+
+    if (updateRequest.getCurrBowlingScore() != null)
+      user.setCurrBowlingScore(updateRequest.getCurrBowlingScore());
+
+    if (updateRequest.getAvgBowlingScore() != null)
+      user.setAvgBowlingScore(updateRequest.getAvgBowlingScore());
+  }
+
+
   @Builder
   public User(Integer id, String email, String password, Integer gender, Integer height,
       String nickname) {
@@ -118,4 +161,6 @@ public class User {
     this.height = height;
     this.nickname = nickname;
   }
+
+
 }

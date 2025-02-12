@@ -1,10 +1,12 @@
 package com.ssafy.Split.global.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import com.ssafy.Split.global.common.JWT.service.JWTService;
 import com.ssafy.Split.global.common.JWT.util.JWTUtil;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
+import com.ssafy.Split.global.common.response.ApiResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Slf4j
 @AllArgsConstructor
@@ -26,6 +29,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JWTService JWTService;
     private final JWTUtil jwtUtil;
+    private final ObjectMapper objectMapper;
     private long accessTime;
     private long refreshTime;
 
@@ -63,6 +67,17 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setHeader("Authorization", access);
         response.addCookie(jwtUtil.createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
+
+        ApiResponse apiResponse = ApiResponse.builder()
+                .code("SUCCESS")
+                .status(200)
+                .message("login success")
+                .timestamp(LocalDateTime.now().toString())
+                .build();
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 
     //로그인 실패
