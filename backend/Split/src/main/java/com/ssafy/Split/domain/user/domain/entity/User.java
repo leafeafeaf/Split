@@ -108,14 +108,35 @@ public class User {
     this.thema = thema;
   }
 
+
   @Builder
   public User(Integer id, String email, String password, Integer gender, Integer height,
-      String nickname) {
+      String nickname, Integer totalGameCount, String highlight, BigDecimal totalPoseHighscore,
+      BigDecimal totalPoseAvgscore, BigDecimal elbowAngleScore, BigDecimal armStabilityScore,
+      BigDecimal armSpeedScore, Integer thema, Integer currBowlingScore, Integer avgBowlingScore,
+      List<Game> games, List<Progress> progresses, List<Rank> ranks) {
     this.id = id;
     this.email = email;
     this.password = password;
     this.gender = gender;
     this.height = height;
     this.nickname = nickname;
+    this.totalGameCount = totalGameCount;
+    this.highlight = highlight;
+    this.totalPoseHighscore = totalPoseHighscore;
+    this.totalPoseAvgscore = totalPoseAvgscore;
+    this.elbowAngleScore = elbowAngleScore;
+    this.armStabilityScore = armStabilityScore;
+    this.armSpeedScore = armSpeedScore;
+    this.thema = thema;
+    this.currBowlingScore = currBowlingScore;
+    this.avgBowlingScore = avgBowlingScore;
+    this.games = games;
+    this.progresses = progresses;
+    this.ranks = ranks;
+  }
+
+  public void increaseTotalGameCount() {
+    this.totalGameCount += 1;
   }
 }
