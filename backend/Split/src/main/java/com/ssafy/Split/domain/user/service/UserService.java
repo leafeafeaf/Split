@@ -52,7 +52,7 @@ public class UserService {
     }
 
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
     // 하이라이트가 이미 존재하는 경우
     if (user.getHighlight() != null && !user.getHighlight().isEmpty()) {
@@ -74,7 +74,7 @@ public class UserService {
     }
 
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
     // 기존 하이라이트가 없는 경우
     if (user.getHighlight() == null || user.getHighlight().isEmpty()) {
