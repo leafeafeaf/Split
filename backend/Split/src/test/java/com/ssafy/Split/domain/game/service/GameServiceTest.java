@@ -158,4 +158,58 @@ class GameServiceTest {
 
     verify(userRepository, times(1)).save(user);
   }
+
+  @Test
+  @DisplayName("볼링 점수 업데이트 테스트 (평균 및 현재 점수)")
+  void updateBowlingScoreTest() {
+    // given
+    User user = User.builder()
+        .totalGameCount(1)      // 1로 수정 (현재 점수 하나만 있음)
+        .avgBowlingScore(150)   // 현재 평균 150점
+        .currBowlingScore(160)  // 현재 최신 점수 160점
+        .totalPoseHighscore(BigDecimal.ZERO)
+        .totalPoseAvgscore(BigDecimal.ZERO)
+        .elbowAngleScore(BigDecimal.ZERO)
+        .armStabilityScore(BigDecimal.ZERO)
+        .armSpeedScore(BigDecimal.ZERO)
+        .build();
+
+    Game game = Game.builder()
+        .bowlingScore(180)      // 새로운 게임 180점
+        .poseHighscore(new BigDecimal("90.0"))
+        .poseAvgscore(new BigDecimal("85.0"))
+        .elbowAngleScore(new BigDecimal("80.0"))
+        .armStabilityScore(new BigDecimal("75.0"))
+        .armSpeed(new BigDecimal("70.0"))
+        .build();
+
+    System.out.println("=== 볼링 점수 업데이트 전 ===");
+    System.out.println("현재 평균 점수: " + user.getAvgBowlingScore());
+    System.out.println("현재 최신 점수: " + user.getCurrBowlingScore());
+    System.out.println("새 게임 점수: " + game.getBowlingScore());
+
+    // when
+    when(userRepository.save(any(User.class))).thenReturn(user);
+    gameService.updateUserStats(user, game);
+
+    // then
+    System.out.println("=== 볼링 점수 업데이트 후 ===");
+    System.out.println("새로운 평균: " + user.getAvgBowlingScore());
+    System.out.println("새로운 현재 점수: " + user.getCurrBowlingScore());
+
+    // 평균 점수 확인 (150 + 180) / 2 = 165
+    assertEquals(165, user.getAvgBowlingScore(),
+        String.format("Expected bowling average: 165, but was: %d", user.getAvgBowlingScore()));
+
+    // 현재 점수는 항상 최신 게임 점수여야 함
+    assertEquals(180, user.getCurrBowlingScore(),
+        String.format("Expected current bowling score: 180, but was: %d",
+            user.getCurrBowlingScore()));
+
+    // 게임 카운트 확인
+    assertEquals(2, user.getTotalGameCount(),
+        String.format("Expected game count: 2, but was: %d", user.getTotalGameCount()));
+  }
+
+
 }
