@@ -1,21 +1,25 @@
 package com.ssafy.Split.domain.game.controller;
 
 
-import com.ssafy.Split.domain.game.service.GameService;
 import com.ssafy.Split.domain.game.domain.dto.request.GameUploadRequest;
+import com.ssafy.Split.domain.game.domain.dto.response.GameListResponse;
+import com.ssafy.Split.domain.game.domain.dto.response.GameResponse;
 import com.ssafy.Split.domain.game.domain.dto.response.GameUploadResponse;
-import com.ssafy.Split.domain.user.exception.UserNotFoundException;
+import com.ssafy.Split.domain.game.service.GameService;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,35 +27,73 @@ import java.time.LocalDateTime;
 @Slf4j
 public class GameController {
 
-    private final GameService gameService;
+  private final GameService gameService;
+
+  /**
+   * 게임 등록
+   **/
+  @PostMapping
+  public ResponseEntity<GameUploadResponse> uploadGame(
+      @Valid @RequestBody GameUploadRequest request) {
+
+    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    int userId = userDetails.getUser().getId();
+
+    Integer gameId = gameService.uploadGame(userId, request);
+
+    return ResponseEntity.ok(GameUploadResponse.builder()
+        .code("SUCCESS")
+        .status(200)
+        .message("GAME upload successfully")
+        .timestamp(LocalDateTime.now().toString())
+        .data(GameUploadResponse.GameData.builder().id(gameId).build())
+        .build());
+  }
+
+  /**
+   * 게임 id로 게임 조회
+   **/
+  @GetMapping("/{gameId}")
+  public ResponseEntity<GameResponse> getGame(@PathVariable Integer gameId) {
+
+    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    int userId = userDetails.getUser().getId();
+
+    GameResponse.GameData gameData = gameService.getGame(userId, gameId);
+
+    return ResponseEntity.ok(GameResponse.builder()
+        .code("SUCCESS")
+        .status(200)
+        .message("get Game data successfully")
+        .data(gameData) // 게임 데이터 반환
+        .timestamp(LocalDateTime.now().toString())
+        .build());
+  }
 
 
-    // user 대한 정보는 jwt 구현을 통해 수정 예정
-    @PostMapping
-    public ResponseEntity<GameUploadResponse> uploadGame(
-            @Valid @RequestBody GameUploadRequest request) {
-        try {
-            Integer gameId = gameService.uploadGame(request);
+  /**
+   * 유저를 통한 게임 조회
+   **/
+  @GetMapping
+  public ResponseEntity<GameListResponse> getGameList(
+      @RequestParam(required = false) Integer count) {
 
-            return ResponseEntity.ok(GameUploadResponse.builder()
-                    .code("SUCCESS")
-                    .status(200)
-                    .message("GAME upload successfully")
-                    .timestamp(LocalDateTime.now().toString())
-                    .data(GameUploadResponse.GameData.builder()
-                            .id(gameId)
-                            .build())
-                    .build());
+    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    int userId = userDetails.getUser().getId();
 
-        } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(GameUploadResponse.builder()
-                            .code("ERROR")
-                            .status(404)
-                            .message(e.getMessage())
-                            .timestamp(LocalDateTime.now().toString())
-                            .build());
-        }
-    }
+    GameListResponse.GameListData listData = gameService.getGameList(userId, count);
+
+    return ResponseEntity.ok(GameListResponse.builder()
+        .code("SUCCESS")
+        .status(200)
+        .message("Game list retrieved successfully")
+        .data(listData)
+        .timestamp(LocalDateTime.now().toString())
+        .build());
+  }
 }
+
 

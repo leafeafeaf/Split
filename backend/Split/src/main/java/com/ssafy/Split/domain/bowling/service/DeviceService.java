@@ -1,83 +1,71 @@
 package com.ssafy.Split.domain.bowling.service;
 
-import com.ssafy.Split.domain.bowling.controller.AuthenticationProvider;
-import com.ssafy.Split.domain.bowling.domain.dto.request.DeviceMeasurementRequest;
 import com.ssafy.Split.domain.bowling.domain.entity.Device;
-import com.ssafy.Split.domain.bowling.domain.entity.Frame;
 import com.ssafy.Split.domain.bowling.domain.entity.Progress;
-import com.ssafy.Split.domain.bowling.exception.DeviceInUseException;
-import com.ssafy.Split.domain.bowling.exception.DeviceNotFoundException;
 import com.ssafy.Split.domain.bowling.repository.DeviceRepository;
-import com.ssafy.Split.domain.bowling.repository.FrameRepository;
 import com.ssafy.Split.domain.bowling.repository.ProgressRepository;
 import com.ssafy.Split.domain.user.domain.entity.User;
-import com.ssafy.Split.domain.user.exception.UserNotFoundException;
 import com.ssafy.Split.domain.user.repository.UserRepository;
-import lombok.Builder;
+import com.ssafy.Split.global.common.JWT.domain.CustomUserDetails;
+import com.ssafy.Split.global.common.exception.ErrorCode;
+import com.ssafy.Split.global.common.exception.SplitException;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
-@Builder
 @RequiredArgsConstructor
 @Slf4j
 public class DeviceService {
 
-    private final DeviceRepository deviceRepository;
-    private final ProgressRepository progressRepository;
-    private final FrameRepository frameRepository;
-    private final AuthenticationProvider authProvider;
-    private final UserRepository userRepository;
+  private final DeviceRepository deviceRepository;
+  private final ProgressRepository progressRepository;
+  private final UserRepository userRepository;
 
-    @Transactional
-    public void startMeasurement(String serial, DeviceMeasurementRequest request, String token) {
-        // 토큰 검증 (현재는 항상 true)
-//        if (!authProvider.validateToken(token)) {
-//            throw new InvalidTokenException();
+  @Transactional
+  public void startMeasurement(int serial) {
+    CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext()
+        .getAuthentication().getPrincipal();
+    int userId = userDetails.getUser().getId();
 
-        // 토큰에서 사용자 ID 추출 (현재는 request의 userID 사용)
-        Long tokenUserId = authProvider.getUserIdFromToken(token);
-        Long userId = tokenUserId != null ? tokenUserId : request.getUserId();
+    // 디바이스 존재 여부 확인
+    Device device = deviceRepository.findBySerialNumber(serial)
+        .orElseThrow(() -> new SplitException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(serial)));
 
-        // 디바이스 존재 여부 확인
-        Device device = deviceRepository.findBySerialNumber(request.getSerialNumber())
-                .orElseThrow(() -> new DeviceNotFoundException("Device not found with serial: " + request.getSerialNumber()));
+    // 사용자 존재 여부 확인
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
-        // 디바이스 사용 중 여부 확인
-        if (progressRepository.existsByDeviceSerialNumberAndStatusInProgress(request.getSerialNumber())) {
-            throw new DeviceInUseException();
-        }
-        // 사용자 존재 여부 확인
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("User not found: " + request.getUserId()));
+    // 디바이스의 Progress 확인
+    LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+    Progress existingProgress = progressRepository.findByDeviceSerialNumber(serial)
+        .orElse(null);
 
+    if (existingProgress != null) {
+      // 프로그레스가 존재하는 경우
+      if (existingProgress.getTime().isAfter(oneHourAgo)) {
+        // 1시간 이내의 프로그레스인 경우 - 사용 중 예외 발생
+        throw new SplitException(ErrorCode.DEVICE_IN_USE, String.valueOf(serial));
+      } else {
+        // 1시간이 지난 프로그레스인 경우 - 기존 데이터 삭제 후 새로운 게임 시작
+//        frameRepository.deleteAllByProgressId(existingProgress.getId());
+        progressRepository.delete(existingProgress);
+      }
+    }
 
+    // 새로운 Progress 생성
+    Progress progress = Progress.builder()
+        .device(device)
+        .user(user)
+        .frameCount(0)
+        .time(LocalDateTime.now())
+        .build();
 
-        // Progress 생성
-        Progress progress = Progress.builder()
-                .device(device)
-                .user(user)
-                .frameCount(0)
-                .time(LocalDateTime.now())
-                .build();
-        log.info("progress : {}", progress);
-
-
-        Progress savedProgress = progressRepository.save(progress);
-        log.info("savedProgress : {}",savedProgress);
-
-        // Frame 생성
-        Frame frame = Frame.builder()
-                .progress(savedProgress)
-                .device(device)
-                .num(1)  // 첫 번째 프레임
-//                .video(null)  // 초기에는 비디오 없음
-                .build();
-        log.info("frame : {}" ,frame);
-        frameRepository.save(frame);
-        }
+    log.info("Creating new progress: {}", progress);
+    Progress savedProgress = progressRepository.save(progress);
+    log.info("Saved progress: {}", savedProgress);
+  }
 }
