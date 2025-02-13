@@ -11,13 +11,6 @@ import api from "@/lib/api"
 import { toast } from "sonner"
 import type { RankingData, SortField, SortOrder } from "@/types/ranking"
 
-// Mock user data - replace with actual user data from your auth system
-const mockUserData = {
-  nickname: "James",
-  gender: "Male",
-  height: 180,
-}
-
 // Number of items to load per page
 const PAGE_SIZE = 20
 
@@ -82,11 +75,6 @@ export default function RankingPage() {
     fetchRankings(1)
   }, [fetchRankings])
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logging out...")
-  }
-
   const loadMoreRankings = useCallback(() => {
     if (!isLoading && hasMore) {
       setPage((prev) => {
@@ -112,14 +100,14 @@ export default function RankingPage() {
     fetchRankings(1)
   }
 
-  // Find current user's ranking (you would typically get the current user ID from your auth system)
-  const currentUserRanking = rankings.find((r) => r.nickname === mockUserData.nickname)
+  // Find current user's ranking (set to null when user is not authenticated)
+  const currentUserRanking = null
 
   return (
     <div className="min-h-screen bg-[#161622] p-6 pb-24">
       <div className="flex justify-between items-center mb-8">
         <ThemeToggle />
-        <UserMenu userData={mockUserData} onLogout={handleLogout} />
+        <UserMenu />
       </div>
 
       <div className="max-w-2xl mx-auto">
@@ -132,7 +120,7 @@ export default function RankingPage() {
         ) : (
           <RankingList
             rankings={rankings}
-            currentUserNickname={mockUserData.nickname}
+            currentUserNickname={undefined} // Set to undefined when user is not authenticated
             hasMore={hasMore}
             isLoading={isLoading}
             onLoadMore={loadMoreRankings}

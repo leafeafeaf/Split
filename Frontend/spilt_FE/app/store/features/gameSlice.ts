@@ -15,17 +15,20 @@ const initialState: GameState = {
   error: null,
 }
 
-export const fetchGames = createAsyncThunk("game/fetchGames", async (count = 10, { rejectWithValue }) => {
-  try {
-    const response = await api.get("/game", { params: { count } })
-    if (response.data.code === "SUCCESS") {
-      return response.data.data.gameArr
+export const fetchGames = createAsyncThunk<GameData[], number, { rejectValue: string }>(
+  "game/fetchGames",
+  async (count = 10, { rejectWithValue }) => {
+    try {
+      const response = await api.get("/game", { params: { count } })
+      if (response.data.code === "SUCCESS") {
+        return response.data.data.gameArr
+      }
+      return rejectWithValue("Failed to fetch games")
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch games")
     }
-    return rejectWithValue("Failed to fetch games")
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || "Failed to fetch games")
-  }
-})
+  },
+)
 
 export const gameSlice = createSlice({
   name: "game",

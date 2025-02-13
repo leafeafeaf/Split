@@ -11,13 +11,6 @@ import { ButtonPrimary } from "@/components/ui/button-primary"
 import { SerialNumberModal } from "@/components/modals/serial-number-modal"
 import { useAppSelector } from "@/app/store/hooks"
 
-// Mock user data
-const mockUserData = {
-  nickname: "James",
-  gender: "Male",
-  height: 180,
-}
-
 // Mock posture data - replace image URLs with actual posture images
 const postures = Array.from({ length: 9 }, (_, i) => ({
   id: i + 1,
@@ -49,7 +42,7 @@ export default function CheckPage() {
     <div className="min-h-screen bg-[#161622] p-6 pb-24">
       <div className="flex justify-between items-center mb-8">
         <ThemeToggle />
-        <UserMenu userData={mockUserData} onLogout={() => {}} />
+        <UserMenu />
       </div>
 
       <div className="max-w-md mx-auto space-y-8">
