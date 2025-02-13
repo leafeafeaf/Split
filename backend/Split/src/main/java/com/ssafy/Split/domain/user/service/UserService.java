@@ -9,7 +9,6 @@ import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
 import com.ssafy.Split.global.infra.s3.S3Service;
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -183,64 +182,19 @@ public class UserService {
     user = userRepository.findById(id)
         .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(id)));
 
-    if (updateRequest.getGender() != null) {
-      user.setGender(updateRequest.getGender());
-    }
-    if (updateRequest.getHeight() != null) {
-      user.setHeight(updateRequest.getHeight());
-    }
-    if (updateRequest.getNickname() != null) {
-      user.setNickname(updateRequest.getNickname());
-    }
-    if (updateRequest.getTotalGameCount() != null) {
-      user.setTotalGameCount(updateRequest.getTotalGameCount());
-    }
-    if (updateRequest.getHighlight() != null) {
-      user.setHighlight(updateRequest.getHighlight());
-    }
-    if (updateRequest.getTotalPoseHighscore() != null) {
-      user.setTotalPoseHighscore(
-          BigDecimal.valueOf(updateRequest.getTotalPoseHighscore()));
-    }
-    if (updateRequest.getTotalPoseAvgscore() != null) {
-      user.setTotalPoseAvgscore(
-          BigDecimal.valueOf(updateRequest.getTotalPoseAvgscore()));
-    }
-    if (updateRequest.getElbowAngleScore() != null) {
-      user.setElbowAngleScore(
-          BigDecimal.valueOf(updateRequest.getElbowAngleScore()));
-    }
-    if (updateRequest.getArmStabilityScore() != null) {
-      user.setArmStabilityScore(
-          BigDecimal.valueOf(updateRequest.getArmStabilityScore()));
-    }
-    if (updateRequest.getArmSpeedScore() != null) {
-      user.setArmSpeedScore(
-          BigDecimal.valueOf(updateRequest.getArmSpeedScore()));
-    }
-    if (updateRequest.getThema() != null) {
-      user.setThema(updateRequest.getThema());
-    }
-    if (updateRequest.getCurrBowlingScore() != null) {
-      user.setCurrBowlingScore(updateRequest.getCurrBowlingScore());
-    }
-    if (updateRequest.getAvgBowlingScore() != null) {
-      user.setAvgBowlingScore(updateRequest.getAvgBowlingScore());
+    String nickname = updateRequest.getNickname();
+    //이름이 변경되었다면 중복확인
+    if (!nickname.equals(user.getNickname())) {
+      if (userRepository.existsByNickname(nickname)) {
+        throw new SplitException(ErrorCode.USER_ALREADY_EXISTS, "nickname", nickname);
+      }
     }
 
+    user.updateUser(user, updateRequest);
 
-        String nickname = updateRequest.getNickname();
-        //이름이 변경되었다면 중복확인
-        if(!nickname.equals(user.getNickname())){
-            if(userRepository.existsByNickname(nickname)) throw new SplitException(ErrorCode.USER_ALREADY_EXISTS,"nickname",nickname);
-        }
-
-        user.updateUser(user, updateRequest);
-
-        userRepository.save(user); // 변경사항 저장
-
-    }
+    userRepository.save(user); // 변경사항 저장
 
   }
 
 }
+

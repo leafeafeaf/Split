@@ -33,20 +33,30 @@ public class DeviceService {
 
     // 디바이스 존재 여부 확인
     Device device = deviceRepository.findBySerialNumber(serial)
-        .orElseThrow(
-            () -> new SplitException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(serial)));
-
-    // 3시간 이내의 진행 중인 Progress가 있는지 확인
-    LocalDateTime threeHoursAgo = LocalDateTime.now().minusHours(3);
-    if (progressRepository.existsByDeviceSerialNumberAndTimeAfter(serial, threeHoursAgo)) {
-      throw new SplitException(ErrorCode.DEVICE_IN_USE, String.valueOf(serial));
-    }
+        .orElseThrow(() -> new SplitException(ErrorCode.DEVICE_NOT_FOUND, String.valueOf(serial)));
 
     // 사용자 존재 여부 확인
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
-    // Progress 생성
+    // 디바이스의 Progress 확인
+    LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
+    Progress existingProgress = progressRepository.findByDeviceSerialNumber(serial)
+        .orElse(null);
+
+    if (existingProgress != null) {
+      // 프로그레스가 존재하는 경우
+      if (existingProgress.getTime().isAfter(oneHourAgo)) {
+        // 1시간 이내의 프로그레스인 경우 - 사용 중 예외 발생
+        throw new SplitException(ErrorCode.DEVICE_IN_USE, String.valueOf(serial));
+      } else {
+        // 1시간이 지난 프로그레스인 경우 - 기존 데이터 삭제 후 새로운 게임 시작
+//        frameRepository.deleteAllByProgressId(existingProgress.getId());
+        progressRepository.delete(existingProgress);
+      }
+    }
+
+    // 새로운 Progress 생성
     Progress progress = Progress.builder()
         .device(device)
         .user(user)
@@ -54,18 +64,8 @@ public class DeviceService {
         .time(LocalDateTime.now())
         .build();
 
-    log.info("progress : {}", progress);
+    log.info("Creating new progress: {}", progress);
     Progress savedProgress = progressRepository.save(progress);
-    log.info("savedProgress : {}", savedProgress);
-    /**
-     // Frame 생성
-     Frame frame = Frame.builder()
-     .progress(savedProgress)
-     .device(device)
-     .num(1)  // 첫 번째 프레임
-     .build();
-     log.info("frame : {}", frame);
-     frameRepository.save(frame);
-     **/
+    log.info("Saved progress: {}", savedProgress);
   }
 }
