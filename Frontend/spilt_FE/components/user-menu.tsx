@@ -1,49 +1,65 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import SmallBowlingBall from "@/components/small-bowling-ball"
+import { useUserStore } from "@/lib/user"
 
-interface UserData {
-  nickname: string
-  gender: string
-  height: number
+const GENDER_MAP = {
+  1: "Male",
+  2: "Female",
+  3: "Prefer not to say",
 }
 
-interface UserMenuProps {
-  userData: UserData
-  onLogout: () => void
-}
-
-export function UserMenu({ userData, onLogout }: UserMenuProps) {
+export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false)
-  const router = useRouter()
+  const { user, isLoading, fetchUser, logout } = useUserStore()
 
-  const handleLogout = () => {
-    onLogout()
-    router.push("/login")
+  useEffect(() => {
+    if (isOpen && !user && !isLoading) {
+      fetchUser()
+    }
+  }, [isOpen, user, isLoading, fetchUser])
+
+  const handleLogout = async () => {
+    setIsOpen(false)
+    await logout()
   }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="p-1 hover:opacity-80 transition-opacity" aria-label="User menu">
+        <button
+          className={`p-1 hover:opacity-80 transition-opacity ${isLoading ? "opacity-50 cursor-wait" : ""}`}
+          aria-label="User menu"
+          disabled={isLoading}
+        >
           <SmallBowlingBall />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48 bg-[#1E1E2D] border-[#2E2E3D] mt-2">
-        <DropdownMenuItem className="flex flex-col items-start py-2 text-white cursor-default">
-          <span className="text-lg font-medium">{userData.nickname}</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem className="py-2 text-[#A2A2A7] cursor-default">Gender: {userData.gender}</DropdownMenuItem>
-        <DropdownMenuItem className="py-2 text-[#A2A2A7] cursor-default">Height: {userData.height}cm</DropdownMenuItem>
-        <DropdownMenuItem
-          className="py-2 text-red-400 cursor-pointer hover:text-red-300 hover:bg-white/5"
-          onClick={handleLogout}
-        >
-          Logout
-        </DropdownMenuItem>
+        {user ? (
+          <>
+            <DropdownMenuItem className="flex flex-col items-start py-2 text-white cursor-default">
+              <span className="text-lg font-medium">{user.nickname}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="py-2 text-[#A2A2A7] cursor-default">
+              Gender: {GENDER_MAP[user.gender as keyof typeof GENDER_MAP]}
+            </DropdownMenuItem>
+            <DropdownMenuItem className="py-2 text-[#A2A2A7] cursor-default">Height: {user.height}cm</DropdownMenuItem>
+            <DropdownMenuItem
+              className="py-2 text-red-400 cursor-pointer hover:text-red-300 hover:bg-white/5"
+              onClick={handleLogout}
+              disabled={isLoading}
+            >
+              {isLoading ? "Logging out..." : "Logout"}
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <DropdownMenuItem className="py-2 text-[#A2A2A7] cursor-default">
+            {isLoading ? "Loading..." : "Failed to load user data"}
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

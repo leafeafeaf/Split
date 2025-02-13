@@ -2,37 +2,139 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, User, Check, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import BackButton from "@/components/back-button"
+import api from "@/lib/api"
+import { toast } from "sonner"
+import { useDebouncedCallback } from "use-debounce"
+
+// Gender mapping as per API specification
+const GENDER_MAP = {
+  male: 1,
+  female: 2,
+  unspecified: 3,
+}
+
+type GenderKey = keyof typeof GENDER_MAP
+
+interface NicknameValidation {
+  isChecking: boolean
+  isValid: boolean | null
+  message: string
+}
 
 export default function SignUpPage() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [nicknameValidation, setNicknameValidation] = useState<NicknameValidation>({
+    isChecking: false,
+    isValid: null,
+    message: "",
+  })
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
-    gender: "",
+    gender: "" as GenderKey,
     height: "170",
     nickname: "",
   })
 
+  const checkNickname = useDebouncedCallback(async (nickname: string) => {
+    if (!nickname) {
+      setNicknameValidation({
+        isChecking: false,
+        isValid: null,
+        message: "",
+      })
+      return
+    }
+
+    setNicknameValidation((prev) => ({ ...prev, isChecking: true }))
+
+    try {
+      await api.get(`/user/check-nickname/${nickname}`)
+      setNicknameValidation({
+        isChecking: false,
+        isValid: true,
+        message: "Nickname is available",
+      })
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        setNicknameValidation({
+          isChecking: false,
+          isValid: false,
+          message: "Nickname is already taken",
+        })
+      } else {
+        setNicknameValidation({
+          isChecking: false,
+          isValid: false,
+          message: "Failed to check nickname",
+        })
+      }
+    }
+  }, 500) // 500ms debounce
+
+  const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNickname = e.target.value
+    setFormData((prev) => ({ ...prev, nickname: newNickname }))
+    checkNickname(newNickname)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!")
+      return
+    }
+
+    if (!nicknameValidation.isValid) {
+      toast.error("Please choose a valid nickname")
+      return
+    }
+
+    setIsLoading(true)
+
     try {
-      if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match!")
-        return
+      const formDataToSend = new FormData()
+      formDataToSend.append("email", formData.email)
+      formDataToSend.append("password", formData.password)
+      formDataToSend.append("nickname", formData.nickname)
+      formDataToSend.append("gender", GENDER_MAP[formData.gender].toString())
+      formDataToSend.append("height", formData.height)
+
+      const response = await api.post("/user", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+
+      if (response.data.code === "SUCCESS") {
+        toast.success("Successfully registered!")
+        router.push("/login")
       }
-      // Add your signup logic here
-      router.push("/login")
-    } catch (error) {
-      console.error("Signup error:", error)
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        if (error.response.data.code === "EMAIL_ALREADY_EXISTS") {
+          toast.error("This email is already registered")
+        } else if (error.response.data.code === "NICKNAME_ALREADY_EXISTS") {
+          toast.error("This nickname is already taken")
+        }
+      } else if (error.response?.status === 400) {
+        toast.error("Please check your email and password format")
+      } else {
+        toast.error("An error occurred. Please try again.")
+      }
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -60,6 +162,7 @@ export default function SignUpPage() {
                 className="bg-transparent border-[#A2A2A7] pl-10 text-white"
                 placeholder="example@email.com"
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -77,11 +180,13 @@ export default function SignUpPage() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="bg-transparent border-[#A2A2A7] pl-10 pr-10 text-white"
                 required
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A2A7] hover:text-white transition-colors"
+                disabled={isLoading}
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -101,11 +206,13 @@ export default function SignUpPage() {
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 className="bg-transparent border-[#A2A2A7] pl-10 pr-10 text-white"
                 required
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A2A2A7] hover:text-white transition-colors"
+                disabled={isLoading}
               >
                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -114,20 +221,29 @@ export default function SignUpPage() {
 
           <div className="space-y-2">
             <Label className="text-[#A2A2A7]">Gender</Label>
-            <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
+            <Select
+              value={formData.gender}
+              onValueChange={(value: GenderKey) => setFormData({ ...formData, gender: value })}
+              disabled={isLoading}
+            >
               <SelectTrigger className="bg-transparent border-[#A2A2A7] text-white">
                 <SelectValue placeholder="Select your gender" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="unspecified">Prefer not to say</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
             <Label className="text-[#A2A2A7]">Height</Label>
-            <Select value={formData.height} onValueChange={(value) => setFormData({ ...formData, height: value })}>
+            <Select
+              value={formData.height}
+              onValueChange={(value) => setFormData({ ...formData, height: value })}
+              disabled={isLoading}
+            >
               <SelectTrigger className="bg-transparent border-[#A2A2A7] text-white">
                 <SelectValue placeholder="Select your height" />
               </SelectTrigger>
@@ -151,16 +267,41 @@ export default function SignUpPage() {
                 id="nickname"
                 type="text"
                 value={formData.nickname}
-                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                className="bg-transparent border-[#A2A2A7] pl-10 text-white"
+                onChange={handleNicknameChange}
+                className={`bg-transparent border-[#A2A2A7] pl-10 pr-10 text-white ${
+                  nicknameValidation.isValid === true
+                    ? "border-green-500"
+                    : nicknameValidation.isValid === false
+                      ? "border-red-500"
+                      : ""
+                }`}
                 placeholder="Enter your nickname"
                 required
+                disabled={isLoading}
               />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                {nicknameValidation.isChecking ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#A2A2A7] border-t-transparent" />
+                ) : nicknameValidation.isValid === true ? (
+                  <Check className="h-5 w-5 text-green-500" />
+                ) : nicknameValidation.isValid === false ? (
+                  <X className="h-5 w-5 text-red-500" />
+                ) : null}
+              </div>
             </div>
+            {nicknameValidation.message && (
+              <p className={`text-sm ${nicknameValidation.isValid ? "text-green-500" : "text-red-500"}`}>
+                {nicknameValidation.message}
+              </p>
+            )}
           </div>
 
-          <Button type="submit" className="w-full bg-[#0066FF] hover:bg-[#0066FF]/90 text-white">
-            Sign Up
+          <Button
+            type="submit"
+            className="w-full bg-[#0066FF] hover:bg-[#0066FF]/90 text-white"
+            disabled={isLoading || nicknameValidation.isChecking || nicknameValidation.isValid === false}
+          >
+            {isLoading ? "Signing up..." : "Sign Up"}
           </Button>
         </form>
       </div>

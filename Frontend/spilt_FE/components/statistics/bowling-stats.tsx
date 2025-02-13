@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 
 interface BowlingStatItemProps {
   label: string
-  value: string | number
+  value: string
   color: string
 }
 

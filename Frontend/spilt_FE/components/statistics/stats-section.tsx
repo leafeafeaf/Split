@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 
 interface StatItemProps {
   label: string
-  value: string | number
+  value: string
   color: string
 }
 
@@ -35,11 +35,7 @@ function StatsGroup({ items }: StatsGroupProps) {
   )
 }
 
-interface PerformanceGroupProps {
-  items: StatItemProps[]
-}
-
-function PerformanceGroup({ items }: PerformanceGroupProps) {
+function PerformanceGroup({ items }: StatsGroupProps) {
   return (
     <Card className="bg-[#1E1E2D] p-6">
       <div className="grid grid-cols-3 gap-8">

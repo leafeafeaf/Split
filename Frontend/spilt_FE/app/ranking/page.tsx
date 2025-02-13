@@ -7,46 +7,80 @@ import { NavigationBar } from "@/components/navigation-bar"
 import { RankingHeader } from "@/components/ranking/ranking-header"
 import { RankingList } from "@/components/ranking/ranking-list"
 import { UserRankingCard } from "@/components/ranking/user-ranking-card"
-import type { UserRanking, SortField, SortOrder } from "@/types/ranking"
+import api from "@/lib/api"
+import { toast } from "sonner"
+import type { RankingData, SortField, SortOrder } from "@/types/ranking"
 
-// Mock user data
+// Mock user data - replace with actual user data from your auth system
 const mockUserData = {
   nickname: "James",
   gender: "Male",
   height: 180,
 }
 
-// Mock current user ID
-const CURRENT_USER_ID = "user-1"
-
-// Mock rankings data generator
-function generateMockRankings(count: number): UserRanking[] {
-  const rankings = Array.from({ length: count }, (_, i) => ({
-    id: `user-${i + 1}`,
-    name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    averageScore: Math.floor(Math.random() * 300) + 100,
-    highScore: Math.floor(Math.random() * 300) + 200,
-  }))
-
-  // Sort by high score and assign ranks
-  return rankings.sort((a, b) => b.highScore - a.highScore).map((ranking, index) => ({ ...ranking, rank: index + 1 }))
-}
+// Number of items to load per page
+const PAGE_SIZE = 20
 
 export default function RankingPage() {
-  const [sortField, setSortField] = useState<SortField>("highScore")
+  const [sortField, setSortField] = useState<SortField>("poseHighscore")
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
-  const [rankings, setRankings] = useState<UserRanking[]>([])
+  const [rankings, setRankings] = useState<RankingData[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [page, setPage] = useState(1)
+  const [error, setError] = useState<string | null>(null)
 
-  // Initialize rankings
+  // Fetch initial rankings
+  const fetchRankings = useCallback(
+    async (pageNum: number) => {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const response = await api.get("/rank")
+
+        if (response.data.code === "SUCCESS") {
+          const newData = response.data.data || []
+
+          // Sort data based on current sort field and order
+          const sortedData = [...newData].sort((a, b) => {
+            const comparison = a[sortField] - b[sortField]
+            return sortOrder === "asc" ? comparison : -comparison
+          })
+
+          // Handle pagination
+          const start = (pageNum - 1) * PAGE_SIZE
+          const paginatedData = sortedData.slice(start, start + PAGE_SIZE)
+
+          if (pageNum === 1) {
+            setRankings(paginatedData)
+          } else {
+            setRankings((prev) => [...prev, ...paginatedData])
+          }
+
+          // Check if we've reached the end of the data
+          setHasMore(newData.length > start + PAGE_SIZE)
+        }
+      } catch (error: any) {
+        if (error.response?.status === 404) {
+          setError("No ranking data available")
+          toast.error("No ranking data available")
+        } else {
+          setError("Failed to load rankings")
+          toast.error("Failed to load rankings")
+        }
+        setHasMore(false)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [sortField, sortOrder],
+  )
+
+  // Initial load
   useEffect(() => {
-    setRankings(generateMockRankings(20))
-  }, [])
-
-  // Find current user's ranking
-  const currentUserRanking = rankings.find((r) => r.id === CURRENT_USER_ID)
+    fetchRankings(1)
+  }, [fetchRankings])
 
   const handleLogout = () => {
     // Add your logout logic here
@@ -54,20 +88,14 @@ export default function RankingPage() {
   }
 
   const loadMoreRankings = useCallback(() => {
-    setIsLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      const newRankings = generateMockRankings(10)
-      setRankings((prev) => {
-        const combined = [...prev, ...newRankings]
-        return combined
-          .sort((a, b) => b.highScore - a.highScore)
-          .map((ranking, index) => ({ ...ranking, rank: index + 1 }))
+    if (!isLoading && hasMore) {
+      setPage((prev) => {
+        const nextPage = prev + 1
+        fetchRankings(nextPage)
+        return nextPage
       })
-      setIsLoading(false)
-      if (rankings.length > 100) setHasMore(false) // Limit for demo
-    }, 1000)
-  }, [rankings.length])
+    }
+  }, [isLoading, hasMore, fetchRankings])
 
   const handleSortFieldChange = (field: SortField) => {
     if (field === sortField) {
@@ -78,14 +106,14 @@ export default function RankingPage() {
       setSortField(field)
       setSortOrder("desc") // Default to descending order
     }
-
-    setRankings((prev) =>
-      [...prev].sort((a, b) => {
-        const comparison = (sortOrder === "asc" ? 1 : -1) * (a[field] - b[field])
-        return comparison
-      }),
-    )
+    // Reset pagination and fetch data again
+    setPage(1)
+    setRankings([])
+    fetchRankings(1)
   }
+
+  // Find current user's ranking (you would typically get the current user ID from your auth system)
+  const currentUserRanking = rankings.find((r) => r.nickname === mockUserData.nickname)
 
   return (
     <div className="min-h-screen bg-[#161622] p-6 pb-24">
@@ -99,13 +127,17 @@ export default function RankingPage() {
 
         <RankingHeader sortField={sortField} sortOrder={sortOrder} onSortFieldChange={handleSortFieldChange} />
 
-        <RankingList
-          rankings={rankings}
-          currentUserId={CURRENT_USER_ID}
-          hasMore={hasMore}
-          isLoading={isLoading}
-          onLoadMore={loadMoreRankings}
-        />
+        {error ? (
+          <div className="text-center text-[#A2A2A7] py-8">{error}</div>
+        ) : (
+          <RankingList
+            rankings={rankings}
+            currentUserNickname={mockUserData.nickname}
+            hasMore={hasMore}
+            isLoading={isLoading}
+            onLoadMore={loadMoreRankings}
+          />
+        )}
       </div>
 
       <NavigationBar />

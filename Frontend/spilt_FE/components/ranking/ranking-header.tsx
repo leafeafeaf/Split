@@ -17,13 +17,13 @@ export function RankingHeader({ sortField, sortOrder, onSortFieldChange }: Ranki
         <div className="text-[#A2A2A7]">User</div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onSortFieldChange("averageScore")}
+            onClick={() => onSortFieldChange("poseAvgscore")}
             className={`${
-              sortField === "averageScore" ? "text-[#0066FF]" : "text-[#A2A2A7]"
+              sortField === "poseAvgscore" ? "text-[#0066FF]" : "text-[#A2A2A7]"
             } hover:text-[#0066FF] transition-colors flex items-center gap-1`}
           >
             Avg Score
-            {sortField === "averageScore" &&
+            {sortField === "poseAvgscore" &&
               (sortOrder === "asc" ? (
                 <SortAscendingIcon className="w-4 h-4" />
               ) : (
@@ -33,13 +33,13 @@ export function RankingHeader({ sortField, sortOrder, onSortFieldChange }: Ranki
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => onSortFieldChange("highScore")}
+            onClick={() => onSortFieldChange("poseHighscore")}
             className={`${
-              sortField === "highScore" ? "text-[#0066FF]" : "text-[#A2A2A7]"
+              sortField === "poseHighscore" ? "text-[#0066FF]" : "text-[#A2A2A7]"
             } hover:text-[#0066FF] transition-colors flex items-center gap-1`}
           >
             High Score
-            {sortField === "highScore" &&
+            {sortField === "poseHighscore" &&
               (sortOrder === "asc" ? (
                 <SortAscendingIcon className="w-4 h-4" />
               ) : (

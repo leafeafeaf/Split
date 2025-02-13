@@ -5,9 +5,10 @@ import { motion } from "framer-motion"
 interface ProgressButtonProps {
   progress: number
   onClick: () => void
+  disabled?: boolean
 }
 
-export function ProgressButton({ progress, onClick }: ProgressButtonProps) {
+export function ProgressButton({ progress, onClick, disabled = false }: ProgressButtonProps) {
   const isComplete = progress === 100
 
   return (
@@ -26,9 +27,11 @@ export function ProgressButton({ progress, onClick }: ProgressButtonProps) {
       {/* Button */}
       <button
         onClick={onClick}
-        className="absolute inset-0 flex items-center justify-center text-white font-medium text-lg transition-transform active:scale-95"
+        disabled={disabled}
+        className={`absolute inset-0 flex items-center justify-center text-white font-medium text-lg transition-transform active:scale-95 
+          ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
-        {isComplete ? "Finish" : "Skip"}
+        {isComplete ? "Finish" : disabled ? "Processing..." : "Skip"}
       </button>
     </div>
   )
