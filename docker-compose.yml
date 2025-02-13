@@ -10,8 +10,6 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL 인증서 마운트 (읽기 전용)
       - ./cicd/html:/usr/share/nginx/html  # 정적 파일 마운트
     restart: always  # 컨테이너가 종료되면 자동 재시작
-    ports:
-      - "80:80"
   app:
     build:
       context: ./backend/Split
