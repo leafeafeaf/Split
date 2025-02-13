@@ -3,6 +3,9 @@
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ButtonPrimary } from "@/components/ui/button-primary"
+import { useAppDispatch, useAppSelector } from "@/app/store/hooks"
+import { startDeviceMeasurement } from "@/app/features/deviceSlice"
+import { toast } from "sonner"
 
 interface SerialNumberModalProps {
   isOpen: boolean
@@ -12,12 +15,23 @@ interface SerialNumberModalProps {
 
 export function SerialNumberModal({ isOpen, onClose, onSubmit }: SerialNumberModalProps) {
   const [serialNumber, setSerialNumber] = useState("")
+  const dispatch = useAppDispatch()
+  const { isLoading, error } = useAppSelector((state) => state.device)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (serialNumber.trim()) {
-      onSubmit(serialNumber.trim())
-      onClose()
+      try {
+        await dispatch(startDeviceMeasurement(serialNumber.trim())).unwrap()
+        onSubmit(serialNumber.trim())
+        onClose()
+      } catch (error) {
+        if (typeof error === "string") {
+          toast.error(error)
+        } else {
+          toast.error("Failed to start measurement")
+        }
+      }
     }
   }
 
@@ -53,10 +67,12 @@ export function SerialNumberModal({ isOpen, onClose, onSubmit }: SerialNumberMod
                   onChange={(e) => setSerialNumber(e.target.value)}
                   className="w-full px-4 py-2 bg-[#2E2E3D] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0066FF] transition-all"
                   required
+                  disabled={isLoading}
                 />
               </div>
-              <ButtonPrimary type="submit" className="w-full py-3 text-lg font-medium">
-                Submit
+              {error && <p className="text-red-500 text-sm">{error}</p>}
+              <ButtonPrimary type="submit" className="w-full py-3 text-lg font-medium" disabled={isLoading}>
+                {isLoading ? "Connecting..." : "Submit"}
               </ButtonPrimary>
             </form>
           </motion.div>

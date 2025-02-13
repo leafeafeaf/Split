@@ -1,46 +1,48 @@
 "use client"
 
-import { useRef, useCallback, useState } from "react"
-import type { UserRanking } from "@/types/ranking"
+import { useRef, useCallback } from "react"
+import type { RankingData } from "@/types/ranking"
 import { UserHighlightModal } from "@/components/modals/user-highlight-modal"
+import { useState } from "react"
+import { format } from "date-fns"
 
 interface RankingListProps {
-  rankings: UserRanking[]
-  currentUserId: string
+  rankings: RankingData[]
+  currentUserNickname: string
   hasMore: boolean
   isLoading: boolean
   onLoadMore: () => void
 }
 
-function getRankColor(rank: number) {
-  switch (rank) {
-    case 1:
+function getRankColor(index: number) {
+  switch (index) {
+    case 0:
       return "text-yellow-400"
-    case 2:
+    case 1:
       return "text-gray-400"
-    case 3:
+    case 2:
       return "text-amber-700"
     default:
       return "text-white"
   }
 }
 
-function getRankLabel(rank: number) {
-  switch (rank) {
-    case 1:
+function getRankLabel(index: number) {
+  switch (index) {
+    case 0:
       return "1st"
-    case 2:
+    case 1:
       return "2nd"
-    case 3:
+    case 2:
       return "3rd"
     default:
-      return `${rank}th`
+      return `${index + 1}th`
   }
 }
 
-export function RankingList({ rankings, currentUserId, hasMore, isLoading, onLoadMore }: RankingListProps) {
+export function RankingList({ rankings, currentUserNickname, hasMore, isLoading, onLoadMore }: RankingListProps) {
   const observer = useRef<IntersectionObserver>()
-  const [selectedUser, setSelectedUser] = useState<UserRanking | null>(null)
+  const [selectedUser, setSelectedUser] = useState<RankingData | null>(null)
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -56,7 +58,7 @@ export function RankingList({ rankings, currentUserId, hasMore, isLoading, onLoa
     [isLoading, hasMore, onLoadMore],
   )
 
-  const handleUserClick = (user: UserRanking) => {
+  const handleUserClick = (user: RankingData) => {
     setSelectedUser(user)
   }
 
@@ -69,29 +71,31 @@ export function RankingList({ rankings, currentUserId, hasMore, isLoading, onLoa
       <div className="space-y-2">
         {rankings.map((ranking, index) => {
           const isLastElement = index === rankings.length - 1
-          const isCurrentUser = ranking.id === currentUserId
+          const isCurrentUser = ranking.nickname === currentUserNickname
 
           return (
             <div
-              key={ranking.id}
+              key={`${ranking.gameId}-${ranking.userId}`}
               ref={isLastElement ? lastElementRef : null}
               className={`p-4 rounded-lg transition-transform transform hover:scale-[1.02] ${
                 isCurrentUser ? "bg-[#0066FF]/10" : "bg-[#1E1E2D]"
               }`}
             >
               <div className="grid grid-cols-4 items-center">
-                <div className={`font-medium ${getRankColor(ranking.rank)}`}>{getRankLabel(ranking.rank)}</div>
+                <div className={`font-medium ${getRankColor(index)}`}>{getRankLabel(index)}</div>
                 <div className="overflow-hidden">
                   <button
                     onClick={() => handleUserClick(ranking)}
                     className="font-medium text-white hover:text-[#0066FF] transition-colors truncate text-left"
                   >
-                    {ranking.name}
+                    {ranking.nickname}
                   </button>
-                  <div className="text-xs text-[#A2A2A7] truncate">{ranking.email}</div>
+                  <div className="text-xs text-[#A2A2A7] truncate">
+                    {format(new Date(ranking.gameDate), "yyyy-MM-dd")}
+                  </div>
                 </div>
-                <div className="text-white text-center">{ranking.averageScore}</div>
-                <div className="text-white text-center">{ranking.highScore}</div>
+                <div className="text-white text-center">{ranking.poseAvgscore.toFixed(1)}</div>
+                <div className="text-white text-center">{ranking.poseHighscore.toFixed(1)}</div>
               </div>
             </div>
           )
@@ -106,8 +110,8 @@ export function RankingList({ rankings, currentUserId, hasMore, isLoading, onLoa
         <UserHighlightModal
           isOpen={!!selectedUser}
           onClose={handleCloseModal}
-          userName={selectedUser.name}
-          videoUrl={`https://your-s3-bucket.s3.amazonaws.com/highlights/${selectedUser.id}.mp4`}
+          userName={selectedUser.nickname}
+          videoUrl={selectedUser.highlight}
         />
       )}
     </>

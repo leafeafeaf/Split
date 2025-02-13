@@ -9,6 +9,7 @@ import { PostureCard } from "@/components/check/posture-card"
 import { HandToggle } from "@/components/check/hand-toggle"
 import { ButtonPrimary } from "@/components/ui/button-primary"
 import { SerialNumberModal } from "@/components/modals/serial-number-modal"
+import { useAppSelector } from "@/app/store/hooks"
 
 // Mock user data
 const mockUserData = {
@@ -29,11 +30,7 @@ export default function CheckPage() {
   const [isRightHand, setIsRightHand] = useState(true)
   const [currentPage, setCurrentPage] = useState(0)
   const [isSerialModalOpen, setIsSerialModalOpen] = useState(false)
-
-  const handleLogout = () => {
-    // Add your logout logic here
-    console.log("Logging out...")
-  }
+  const { currentSerial } = useAppSelector((state) => state.device)
 
   const handleStartMeasurement = () => {
     if (selectedPosture === null) {
@@ -44,8 +41,7 @@ export default function CheckPage() {
   }
 
   const handleSerialSubmit = (serialNumber: string) => {
-    console.log("Serial Number:", serialNumber)
-    // Here you would typically send the serial number to your backend
+    // After successful device connection, navigate to measure page
     router.push("/check/measure")
   }
 
@@ -53,7 +49,7 @@ export default function CheckPage() {
     <div className="min-h-screen bg-[#161622] p-6 pb-24">
       <div className="flex justify-between items-center mb-8">
         <ThemeToggle />
-        <UserMenu userData={mockUserData} onLogout={handleLogout} />
+        <UserMenu userData={mockUserData} onLogout={() => {}} />
       </div>
 
       <div className="max-w-md mx-auto space-y-8">
