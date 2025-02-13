@@ -15,7 +15,7 @@ export const useGameStore = create<GameStore>((set) => ({
   fetchGames: async (count = 10) => {
     set({ isLoading: true })
     try {
-      const response = await api.get("/game", {
+      const response = await api.get("game", {
         // Add headers when token is implemented
         // headers: {
         //   Authorization: `Bearer ${token}`,

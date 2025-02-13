@@ -9,9 +9,10 @@ import { ButtonPrimary } from "@/components/ui/button-primary"
 import { HighlightWarningModal } from "@/components/modals/highlight-warning-modal"
 import { BowlingScoreModal } from "@/components/modals/bowling-score-modal"
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks"
-import { uploadGame, clearGameData, setBowlingScore } from "@/app/features/gameSlice"
+import { clearGameData, setBowlingScore } from "@/app/features/gameSlice"
 import { clearFrames } from "@/app/features/frameSlice"
 import { toast } from "sonner"
+import api from "@/app/api/axios"
 
 export default function GameEvaluationPage() {
   const router = useRouter()
@@ -66,7 +67,8 @@ export default function GameEvaluationPage() {
     if (!gameStats || bowlingScore === null) return
 
     try {
-      await dispatch(uploadGame({ frames, bowlingScore })).unwrap()
+      const gameData = { frames, bowlingScore }
+      await api.post("game", gameData)
       dispatch(clearFrames())
       dispatch(clearGameData())
 

@@ -19,7 +19,7 @@ const initialState: UserState = {
 
 export const fetchUser = createAsyncThunk("user/fetchUser", async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get("/user")
+    const response = await api.get("user")
     if (response.data.code === "SUCCESS") {
       return response.data.data
     }
@@ -35,7 +35,7 @@ export const updateHighlight = createAsyncThunk(
     try {
       const response = await api({
         method: isUpdate ? "patch" : "post",
-        url: "/user/highlight",
+        url: "user/highlight",
         data: { highlight },
       })
 

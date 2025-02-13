@@ -17,7 +17,7 @@ export const startDeviceMeasurement = createAsyncThunk(
   "device/startMeasurement",
   async (serial: string, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/device/${serial}`)
+      const response = await api.post(`device/${serial}`)
       return serial
     } catch (error: any) {
       if (error.response?.status === 409) {

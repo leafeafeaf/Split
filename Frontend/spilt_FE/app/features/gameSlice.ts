@@ -61,7 +61,7 @@ export const uploadGame = createAsyncThunk(
         bowlingScore,
       }
 
-      const response = await api.post("/game", gameData)
+      const response = await api.post("game", gameData)
 
       if (response.data.code === "SUCCESS") {
         return response.data.data.id

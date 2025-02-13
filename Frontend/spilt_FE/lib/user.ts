@@ -17,7 +17,7 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ isLoading: true })
     try {
       const response = await api.get(
-        "/user",
+        "user",
         // Add headers when token is implemented
         // {
         //   headers: {
@@ -52,7 +52,7 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ isLoading: true })
     try {
       const response = await api.post(
-        "/logout",
+        "logout",
         // Add headers when token is implemented
         // {
         //   headers: {

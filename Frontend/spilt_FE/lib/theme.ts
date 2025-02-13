@@ -17,7 +17,7 @@ export const useThemeStore = create<ThemeStore>((set) => ({
       const themeValue = newTheme === "light" ? 1 : 2
 
       await api.patch(
-        "/user/thema",
+        "user/thema",
         { thema: themeValue },
         // Add headers when token is implemented
         // {

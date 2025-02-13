@@ -59,16 +59,16 @@
     "vaul": "^0.9.6",
     "zod": "^3.24.1",
     "@emotion/is-prop-valid": "latest",
+    "react-redux": "latest",
     "@types/react": "latest",
+    "redux": "latest",
     "immer": "latest",
     "use-sync-external-store": "latest",
-    "react-redux": "latest",
-    "redux": "latest",
     "framer-motion": "latest",
     "use-debounce": "latest",
     "axios": "latest",
-    "zustand": "latest",
-    "@reduxjs/toolkit": "latest"
+    "@reduxjs/toolkit": "latest",
+    "zustand": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",

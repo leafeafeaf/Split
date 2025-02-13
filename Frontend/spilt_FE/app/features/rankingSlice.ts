@@ -17,7 +17,7 @@ const initialState: RankingState = {
 
 export const fetchRankings = createAsyncThunk("ranking/fetchRankings", async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get("/rank")
+    const response = await api.get("rank")
     if (response.data.code === "SUCCESS") {
       return response.data.data
     }

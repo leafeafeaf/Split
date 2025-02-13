@@ -18,7 +18,7 @@ const initialState: AuthState = {
 
 export const reissueTokens = createAsyncThunk("auth/reissueTokens", async (_, { rejectWithValue }) => {
   try {
-    const response = await api.post("/reissue")
+    const response = await api.post("reissue")
     if (response.data.code === "SUCCESS") {
       return {
         accessToken: response.headers["authorization"],
