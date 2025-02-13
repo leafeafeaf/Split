@@ -12,13 +12,6 @@ import { useAppDispatch, useAppSelector } from "@/app/store/hooks"
 import { fetchFrames, updateProgress, skipFrame } from "@/app/features/frameSlice"
 import { toast } from "sonner"
 
-// Mock user data
-const mockUserData = {
-  nickname: "James",
-  gender: "Male",
-  height: 180,
-}
-
 export default function MeasurePage() {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -59,10 +52,6 @@ export default function MeasurePage() {
     return () => clearInterval(interval)
   }, [pollFrames, progress])
 
-  const handleLogout = () => {
-    console.log("Logging out...")
-  }
-
   const handleSegmentClick = (roundNumber: number) => {
     router.push(`/check/measure/round/${roundNumber}`)
   }
@@ -102,7 +91,7 @@ export default function MeasurePage() {
     <div className="min-h-screen bg-[#161622] p-6 pb-24">
       <div className="flex justify-between items-center mb-12">
         <ThemeToggle />
-        <UserMenu userData={mockUserData} onLogout={handleLogout} />
+        <UserMenu />
       </div>
 
       <div className="max-w-md mx-auto space-y-12">
