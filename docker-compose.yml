@@ -10,6 +10,8 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro  # SSL 인증서 마운트 (읽기 전용)
       - ./cicd/html:/usr/share/nginx/html  # 정적 파일 마운트
     restart: always  # 컨테이너가 종료되면 자동 재시작
+    ports:
+      - "80:80"
   app:
     build:
       context: ./backend/Split
@@ -23,6 +25,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: ${SPRING_REDIS_HOST}
       SPRING_REDIS_PORT: ${SPRING_REDIS_PORT}
+      AWS_S3_ACCESS_KEY: ${AWS_S3_ACCESS_KEY} 
+      AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY}
+      SPRING_JWT_SECRET: ${SPRING_JWT_SECRET}
     depends_on:
       mysql:
         condition: service_healthy
