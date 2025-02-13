@@ -8,7 +8,7 @@ import { format } from "date-fns"
 
 interface RankingListProps {
   rankings: RankingData[]
-  currentUserNickname: string
+  currentUserNickname?: string | null
   hasMore: boolean
   isLoading: boolean
   onLoadMore: () => void
@@ -71,7 +71,7 @@ export function RankingList({ rankings, currentUserNickname, hasMore, isLoading,
       <div className="space-y-2">
         {rankings.map((ranking, index) => {
           const isLastElement = index === rankings.length - 1
-          const isCurrentUser = ranking.nickname === currentUserNickname
+          const isCurrentUser = currentUserNickname !== null && ranking.nickname === currentUserNickname
 
           return (
             <div
