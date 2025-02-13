@@ -13,10 +13,9 @@ import com.ssafy.Split.domain.user.repository.UserRepository;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -76,30 +75,65 @@ public class GameService {
     return savedGame.getId();
   }
 
-  private void updateUserStats(User user, Game game) {
-    // null 체크를 포함한 안전한 비교
-    updateScoreIfHigher(game.getPoseHighscore(), user::getTotalPoseHighscore,
-        user::setTotalPoseHighscore);
-    updateScoreIfHigher(game.getPoseAvgscore(), user::getTotalPoseAvgscore,
-        user::setTotalPoseAvgscore);
-    updateScoreIfHigher(game.getElbowAngleScore(), user::getElbowAngleScore,
-        user::setElbowAngleScore);
-    updateScoreIfHigher(game.getArmStabilityScore(), user::getArmStabilityScore,
-        user::setArmStabilityScore);
-    updateScoreIfHigher(game.getArmSpeed(), user::getArmSpeedScore, user::setArmSpeedScore);
+  protected void updateUserStats(User user, Game game) {
+    // 평균 계산이 필요한 항목들 업데이트
+    user.setTotalPoseAvgscore(calculateNewAverage(
+        user.getTotalPoseAvgscore(),
+        game.getPoseAvgscore(),
+        user.getTotalGameCount()
+    ));
 
+    user.setElbowAngleScore(calculateNewAverage(
+        user.getElbowAngleScore(),
+        game.getElbowAngleScore(),
+        user.getTotalGameCount()
+    ));
+
+    user.setArmStabilityScore(calculateNewAverage(
+        user.getArmStabilityScore(),
+        game.getArmStabilityScore(),
+        user.getTotalGameCount()
+    ));
+
+    user.setArmSpeedScore(calculateNewAverage(
+        user.getArmSpeedScore(),
+        game.getArmSpeed(),
+        user.getTotalGameCount()
+    ));
+
+    user.setAvgBowlingScore(calculateIntegerAverage(
+        user.getAvgBowlingScore(),
+        game.getBowlingScore()
+    ));
+
+    // BigDecimal 타입의 최고 포즈 점수 비교
+    BigDecimal currentHighscore = user.getTotalPoseHighscore();
+    BigDecimal newHighscore = game.getPoseHighscore();
+    user.setTotalPoseHighscore(currentHighscore.max(newHighscore));
+
+    // 현재 볼링 점수는 항상 최신 게임 점수로 갱신
     user.setCurrBowlingScore(game.getBowlingScore());
 
+    // 게임 카운트 증가
+    user.increaseTotalGameCount();
+
+    // 변경된 사용자 정보 저장
     userRepository.save(user);
   }
 
-  private void updateScoreIfHigher(BigDecimal newScore, Supplier<BigDecimal> currentScoreGetter,
-      Consumer<BigDecimal> scoreSetter) {
-    if (newScore != null && (currentScoreGetter.get() == null ||
-        newScore.compareTo(currentScoreGetter.get()) > 0)) {
-      scoreSetter.accept(newScore);
-    }
+  // Integer 타입 평균 계산
+  private int calculateIntegerAverage(int currentAvg, int newValue) {
+    return (currentAvg + newValue) / 2;  // 단순히 두 값의 평균을 계산
   }
+
+  // BigDecimal 타입 평균 계산 (다른 BigDecimal 필드들용)
+  private BigDecimal calculateNewAverage(BigDecimal currentAvg, BigDecimal newValue,
+      int currentCount) {
+    return currentAvg.multiply(BigDecimal.valueOf(currentCount))
+        .add(newValue)
+        .divide(BigDecimal.valueOf(currentCount + 1), 2, RoundingMode.HALF_DOWN);
+  }
+
 
   public GameResponse.GameData getGame(int userId, Integer gameId) {
     Game game = gameRepository.findById(gameId)

@@ -79,9 +79,11 @@ public class Game {
   private Integer bowlingScore;
 
   @Builder
-  public Game(User user, LocalDateTime gameDate, Boolean isSkip, BigDecimal poseHighscore,
+  public Game(Integer id, User user, LocalDateTime gameDate, Boolean isSkip,
+      BigDecimal poseHighscore,
       BigDecimal poseLowscore, BigDecimal poseAvgscore, BigDecimal elbowAngleScore,
       BigDecimal armStabilityScore, BigDecimal armSpeed, Rank rank, Integer bowlingScore) {
+    this.id = id;
     this.user = user;
     this.gameDate = gameDate;
     this.isSkip = isSkip;

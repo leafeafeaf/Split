@@ -27,6 +27,9 @@ public enum ErrorCode {
 
   // Frame
   FRAME_NOT_FOUND(404, "F001", "FRAME not found with Num: %s"),
+  MAX_FRAME_LIMIT(409, "F002", "Cannot add more frames. Maximum limit of 10 frames reached"),
+
+
   // Device
   DEVICE_NOT_FOUND(404, "D001", "Device not found with serial: %s"),
   DEVICE_IN_USE(409, "D002", "Device is already in use: %s"),
@@ -46,7 +49,7 @@ public enum ErrorCode {
   USER_ALREADY_EXISTS(409, "U004", "%s already exists: %s"),
 
   //highlight
-  INVALID_VIDEO_URL(400, "H001", "Invalid video URL format"),
+  INVALID_VIDEO_URL(400, "FH001", "Invalid video URL format"),
   HIGHLIGHT_ALREADY_EXISTS(400, "H002", "Highlight already exists for this user"),
   HIGHLIGHT_NOT_FOUND(404, "H003", "Highlight not found for this user"),
 

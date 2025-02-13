@@ -41,6 +41,10 @@ public class FrameService {
         .orElseThrow(
             () -> new SplitException(ErrorCode.PROGRESS_NOT_FOUND, String.valueOf(serial)));
 
+    if (progress.getFrameCount() >= 10) {
+      throw new SplitException(ErrorCode.MAX_FRAME_LIMIT);
+    }
+
     // 현재 프레임 번호 계산
     Integer currentFrameNum = progress.getFrameCount() + 1;
 
@@ -82,17 +86,28 @@ public class FrameService {
     Frame frame = frameRepository.findByProgressIdAndNum(progress.getId(), frameNum)
         .orElseThrow(() -> new SplitException(ErrorCode.FRAME_NOT_FOUND, String.valueOf(frameNum)));
 
+    //해당 프레임의 비디오 URL이 이상하다.
+    if (!(isValidVideoUrl(request.getVideo()))) {
+      log.info("#############{}", request.getVideo());
+      throw new SplitException(ErrorCode.INVALID_VIDEO_URL);
+    }
+
+    // 비디오 URL이 이미 존재하는지 체크
+    if (frame.getVideo() != null) {
+      throw new SplitException(ErrorCode.VIDEO_ALREADY_EXISTS);
+    }
+
     // 비디오 URL 업데이트
     frame.updateVideo(request.getVideo());
     frameRepository.save(frame);
 
-    // 비디오 URL이 이미 존재하는지 체크
-    if (frame.getVideo() == null && frame.getVideo().trim().isEmpty()) {
-      throw new SplitException(ErrorCode.VIDEO_ALREADY_EXISTS);
-    }
-
     log.info("Video URL updated for frame {} of device {}: {}", frameNum, serial,
         request.getVideo());
+  }
+
+  private boolean isValidVideoUrl(String url) {
+    return url.startsWith("https://split-bucket-first-1.s3.ap-northeast-2.amazonaws.com/") &&
+        (url.endsWith(".mov") || url.endsWith(".mp4"));
   }
 
   /**
