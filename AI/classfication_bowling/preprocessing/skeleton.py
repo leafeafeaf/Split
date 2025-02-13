@@ -56,62 +56,113 @@ KEYPOINT_EDGE_INDS_TO_COLOR = {
     (14, 16): 'c'
 }
 
-def _keypoints_and_edges_for_display(keypoints_with_scores,
-                                     height,
-                                     width,
-                                     keypoint_threshold=0.11):
-  """Returns high confidence keypoints and edges for visualization.
+def _keypoints_and_edges_for_display(
+    keypoints_with_scores, height, width, keypoint_threshold=0.11):
 
-  Args:
-    keypoints_with_scores: A numpy array with shape [1, 1, 17, 3] representing
-      the keypoint coordinates and scores returned from the MoveNet model.
-    height: height of the image in pixels.
-    width: width of the image in pixels.
-    keypoint_threshold: minimum confidence score for a keypoint to be
-      visualized.
+    keypoints_all = []
+    keypoints_scores_all = []  # 추가: 신뢰도를 저장할 리스트
+    keypoint_edges_all = []
+    edge_colors = []
 
-  Returns:
-    A (keypoints_xy, edges_xy, edge_colors) containing:
-      * the coordinates of all keypoints of all detected entities;
-      * the coordinates of all skeleton edges of all detected entities;
-      * the colors in which the edges should be plotted.
-  """
-  keypoints_all = []
-  keypoint_edges_all = []
-  edge_colors = []
-  num_instances, _, _, _ = keypoints_with_scores.shape
-  for idx in range(num_instances):
-    kpts_x = keypoints_with_scores[0, idx, :, 1]
-    kpts_y = keypoints_with_scores[0, idx, :, 0]
-    kpts_scores = keypoints_with_scores[0, idx, :, 2]
-    kpts_absolute_xy = np.stack(
-        [width * np.array(kpts_x), height * np.array(kpts_y)], axis=-1)
-    kpts_above_thresh_absolute = kpts_absolute_xy[
-        kpts_scores > keypoint_threshold, :]
-    keypoints_all.append(kpts_above_thresh_absolute)
+    num_instances, _, _, _ = keypoints_with_scores.shape
+    for idx in range(num_instances):
+        kpts_x = keypoints_with_scores[0, idx, :, 1]
+        kpts_y = keypoints_with_scores[0, idx, :, 0]
+        kpts_scores = keypoints_with_scores[0, idx, :, 2]
+        kpts_absolute_xy = np.stack(
+            [width * np.array(kpts_x), height * np.array(kpts_y)], axis=-1)
+        
+        # 신뢰도 필터링
+        valid_kpts_mask = kpts_scores > keypoint_threshold
+        kpts_above_thresh_absolute = kpts_absolute_xy[valid_kpts_mask, :]
+        kpts_above_thresh_scores = kpts_scores[valid_kpts_mask]  # 추가: 신뢰도 저장
 
-    for edge_pair, color in KEYPOINT_EDGE_INDS_TO_COLOR.items():
-      if (kpts_scores[edge_pair[0]] > keypoint_threshold and
-          kpts_scores[edge_pair[1]] > keypoint_threshold):
-        x_start = kpts_absolute_xy[edge_pair[0], 0]
-        y_start = kpts_absolute_xy[edge_pair[0], 1]
-        x_end = kpts_absolute_xy[edge_pair[1], 0]
-        y_end = kpts_absolute_xy[edge_pair[1], 1]
-        line_seg = np.array([[x_start, y_start], [x_end, y_end]])
-        keypoint_edges_all.append(line_seg)
-        edge_colors.append(color)
-  if keypoints_all:
-    keypoints_xy = np.concatenate(keypoints_all, axis=0)
-  else:
-    keypoints_xy = np.zeros((0, 17, 2))
+        keypoints_all.append(kpts_above_thresh_absolute)
+        keypoints_scores_all.append(kpts_above_thresh_scores)  # 추가: 신뢰도 리스트에 저장
 
-  if keypoint_edges_all:
-    edges_xy = np.stack(keypoint_edges_all, axis=0)
-  else:
-    edges_xy = np.zeros((0, 2, 2))
+        for edge_pair, color in KEYPOINT_EDGE_INDS_TO_COLOR.items():
+            if (kpts_scores[edge_pair[0]] > keypoint_threshold and
+                kpts_scores[edge_pair[1]] > keypoint_threshold):
+                x_start = kpts_absolute_xy[edge_pair[0], 0]
+                y_start = kpts_absolute_xy[edge_pair[0], 1]
+                x_end = kpts_absolute_xy[edge_pair[1], 0]
+                y_end = kpts_absolute_xy[edge_pair[1], 1]
+                line_seg = np.array([[x_start, y_start], [x_end, y_end]])
+                keypoint_edges_all.append(line_seg)
+                edge_colors.append(color)
 
-  # print(keypoints_xy)
-  return keypoints_xy, edges_xy, edge_colors
+    # 리스트 병합 (신뢰도 포함)
+    if keypoints_all:
+        keypoints_xy = np.concatenate(keypoints_all, axis=0)
+        keypoints_scores = np.concatenate(keypoints_scores_all, axis=0)  # 추가
+    else:
+        keypoints_xy = np.zeros((0, 2))
+        keypoints_scores = np.zeros((0,))  # 추가
+
+    if keypoint_edges_all:
+        edges_xy = np.stack(keypoint_edges_all, axis=0)
+    else:
+        edges_xy = np.zeros((0, 2, 2))
+
+    return keypoints_xy, keypoints_scores, edges_xy, edge_colors  # 수정된 반환값
+
+
+# def _keypoints_and_edges_for_display(keypoints_with_scores,
+#                                      height,
+#                                      width,
+#                                      keypoint_threshold=0.11):
+#   """Returns high confidence keypoints and edges for visualization.
+
+#   Args:
+#     keypoints_with_scores: A numpy array with shape [1, 1, 17, 3] representing
+#       the keypoint coordinates and scores returned from the MoveNet model.
+#     height: height of the image in pixels.
+#     width: width of the image in pixels.
+#     keypoint_threshold: minimum confidence score for a keypoint to be
+#       visualized.
+
+#   Returns:
+#     A (keypoints_xy, edges_xy, edge_colors) containing:
+#       * the coordinates of all keypoints of all detected entities;
+#       * the coordinates of all skeleton edges of all detected entities;
+#       * the colors in which the edges should be plotted.
+#   """
+#   keypoints_all = []
+#   keypoint_edges_all = []
+#   edge_colors = []
+#   num_instances, _, _, _ = keypoints_with_scores.shape
+#   for idx in range(num_instances):
+#     kpts_x = keypoints_with_scores[0, idx, :, 0]
+#     kpts_y = keypoints_with_scores[0, idx, :, 1]
+#     kpts_scores = keypoints_with_scores[0, idx, :, 2]
+#     kpts_absolute_xy = np.stack(
+#         [width * np.array(kpts_x), height * np.array(kpts_y)], axis=-1)
+#     kpts_above_thresh_absolute = kpts_absolute_xy[
+#         kpts_scores > keypoint_threshold, :]
+#     keypoints_all.append(kpts_above_thresh_absolute)
+
+#     for edge_pair, color in KEYPOINT_EDGE_INDS_TO_COLOR.items():
+#       if (kpts_scores[edge_pair[0]] > keypoint_threshold and
+#           kpts_scores[edge_pair[1]] > keypoint_threshold):
+#         x_start = kpts_absolute_xy[edge_pair[0], 0]
+#         y_start = kpts_absolute_xy[edge_pair[0], 1]
+#         x_end = kpts_absolute_xy[edge_pair[1], 0]
+#         y_end = kpts_absolute_xy[edge_pair[1], 1]
+#         line_seg = np.array([[x_start, y_start], [x_end, y_end]])
+#         keypoint_edges_all.append(line_seg)
+#         edge_colors.append(color)
+#   if keypoints_all:
+#     keypoints_xy = np.concatenate(keypoints_all, axis=0)
+#   else:
+#     keypoints_xy = np.zeros((0, 17, 2))
+
+#   if keypoint_edges_all:
+#     edges_xy = np.stack(keypoint_edges_all, axis=0)
+#   else:
+#     edges_xy = np.zeros((0, 2, 2))
+
+#   # print(keypoints_xy)
+#   return keypoints_xy, edges_xy, edge_colors
 
 
 def draw_prediction_on_image(
@@ -151,9 +202,12 @@ def draw_prediction_on_image(
   # Turn off tick labels
   scat = ax.scatter([], [], s=60, color='#FF1493', zorder=3)
 
-  (keypoint_locs, keypoint_edges,
+  (keypoint_locs,keypoint_scores, keypoint_edges,
    edge_colors) = _keypoints_and_edges_for_display(
        keypoints_with_scores, height, width)
+  # (keypoint_locs, keypoint_edges,
+  #  edge_colors) = _keypoints_and_edges_for_display(
+  #      keypoints_with_scores, height, width)
 
   line_segments.set_segments(keypoint_edges)
   line_segments.set_color(edge_colors)
@@ -183,7 +237,7 @@ def draw_prediction_on_image(
     image_from_plot = cv2.resize(
         image_from_plot, dsize=(output_image_width, output_image_height),
          interpolation=cv2.INTER_CUBIC)
-  return keypoint_locs,image_from_plot
+  return keypoint_locs,image_from_plot , keypoint_scores
 
 def to_gif(images, fps):
   """Converts image sequence (4D numpy array) to gif."""

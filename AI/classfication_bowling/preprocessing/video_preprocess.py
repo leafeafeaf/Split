@@ -6,6 +6,15 @@ import os
 from preprocessing.labeling import labeling
 import json
 from preprocessing.save_to_Json import save_skel_to_json
+import sys
+from preprocessing.save_to_Json import save_to_json
+
+# similarity_measure 폴더 경로를 추가
+similarity_measure_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..","..", "similarity_measure"))
+sys.path.append(similarity_measure_path)
+
+# 이제 train.py를 import 가능
+# from train import train
 
 def process_videos(input_folder, output_folder, fps=30):
     cnt = 1
@@ -15,6 +24,8 @@ def process_videos(input_folder, output_folder, fps=30):
     video_files = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
     video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
     skel_dataset = []
+    video_idx = 64
+
     for video_file in video_files:
         print(video_file)
         # video_path = video_file
@@ -30,14 +41,12 @@ def process_videos(input_folder, output_folder, fps=30):
 
 
         #---------------유사도 판단 데이터 저장장-------------
-        video_idx = 1
         # 'similar' 폴더 안에 'image_data' 폴더 경로 설정
         output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','image_data',f"image_data_{video_idx}")
         output_folder = os.path.abspath(output_folder)
-        skel_output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','skel_data',f"skel_data_{video_idx}")
+        skel_output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','skel_data')
         skel_output_folder = os.path.abspath(skel_output_folder)
         
-        video_idx +=1
 
         # 폴더가 없으면 생성
         if not os.path.exists(output_folder):
@@ -53,16 +62,13 @@ def process_videos(input_folder, output_folder, fps=30):
                 break
             
             # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
-            frame = cv2.resize(frame, (640, 640))  # 프레임 크기 조정
+            frame = cv2.resize(frame, (128, 128))  # 프레임 크기 조정
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            
             
             # 프레임을 리스트에 저장
             frames.append(frame)
             
-            # 각 프레임을 이미지 파일로 저장 (프레임 번호를 파일명에 추가) ---- 유사도 판단단
-            frame_filename = os.path.join(output_folder, f'frame_{frame_idx:03d}.jpg')
-            cv2.imwrite(frame_filename, cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))  # 다시 BGR로 변환하여 저장
-
             frame_idx += 1
 
         # 비디오 캡처 객체 해제
@@ -83,11 +89,10 @@ def process_videos(input_folder, output_folder, fps=30):
 
         # TensorFlow 텐서로 변환
         image = tf.convert_to_tensor(frames_np, dtype=tf.uint8)
-
         # 텐서 모양 확인
         num_frames, image_height, image_width, channels = image.shape
-        print(f"Processing video: {video_file}")
-        print(f"Number of frames: {num_frames}, Image height: {image_height}, Image width: {image_width}, Channels: {channels}")
+        # print(f"Processing video: {video_file}")
+        # print(f"Number of frames: {num_frames}, Image height: {image_height}, Image width: {image_width}, Channels: {channels}")
 
         # Crop 영역 설정 (여기서 사용하는 함수들을 정의해두셔야 합니다)
         crop_region = init_crop_region(image_height, image_width)
@@ -96,31 +101,60 @@ def process_videos(input_folder, output_folder, fps=30):
 
         # 한 동영상의 frame별 keypoint좌표를 저장할 리스트
         
-        skel_frame_idx = 0
         # bar = display(progress(0, num_frames-1), display_id=True)
+        idx = 0
         for frame_idx in range(num_frames):
             keypoint_dataset = [] # keypoint 좌표가 들어가는 배열
             # print(frame_idx)
             keypoints_with_scores = run_inference(
             movenet, image[frame_idx, :, :, :], crop_region,
             crop_size=[input_size, input_size])
-            (keypoint_xy,output_images_input) =draw_prediction_on_image(
+
+            (keypoint_xy,output_images_input,keypoint_scores) =draw_prediction_on_image(
             image[frame_idx, :, :, :].numpy().astype(np.int32),
             keypoints_with_scores, crop_region=None,
             close_figure=True, output_image_height=300)
         
+            print(f"keyopint_input : {output_images_input}")
+
+            # print(f"keypoint_with_scores : {keypoints_with_scores}")
+            # print(f"keypoint_with_scores shape : {keypoints_with_scores.shape}")
+
+            # # print(keypoint_xy) # 키 포인트 출력 
+            # if keypoint_xy is not None and keypoint_xy.shape[0] == 17:   # 17개 관절이 모두 있어야 함
+                
+            #     for keypoint_dict_idx in range(len(keypoint_xy)):
+            #         for keypoint_xy_idx in range(len(keypoint_xy[0])):
+            #             keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
+            #             keypoint_dataset.append(keypoints_with_scores)
+
+            # if len(keypoint_dataset) == 34:
+            #     # 각 프레임을 이미지 파일로 저장 (프레임 번호를 파일명에 추가) ---- 유사도 판단단
+            #     frame_filename = os.path.join(output_folder, f'frame_{frame_idx}.jpg')
+            #     cv2.imwrite(frame_filename, cv2.cvtColor(frames[frame_idx], cv2.COLOR_RGB2BGR))  # 다시 BGR로 변환하여 저장
+            #     skel_per_video.append(keypoint_dataset)
+            # output_images.append(output_images_input)
+            # crop_region = determine_crop_region(
+            # keypoints_with_scores, image_height, image_width)
             # print(keypoint_xy) # 키 포인트 출력 
             if keypoint_xy is not None and keypoint_xy.shape[0] == 17:   # 17개 관절이 모두 있어야 함
+                idx += 1
                 for keypoint_dict_idx in range(len(keypoint_xy)):
                     for keypoint_xy_idx in range(len(keypoint_xy[0])):
                         keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-            if len(keypoint_dataset) == 34:
+                    keypoint_dataset.append(keypoint_scores[keypoint_dict_idx])
+
+            # if len(keypoint_dataset) == 34:
+                # 각 프레임을 이미지 파일로 저장 (프레임 번호를 파일명에 추가) ---- 유사도 판단단
+                frame_filename = os.path.join(output_folder, f'frame_{idx}.jpg')
+                cv2.imwrite(frame_filename, cv2.cvtColor(output_images_input, cv2.COLOR_RGB2BGR))  # 다시 BGR로 변환하여 저장
+                # cv2.imwrite(frame_filename, cv2.cvtColor(frames[frame_idx], cv2.COLOR_RGB2BGR))  # 다시 BGR로 변환하여 저장
                 skel_per_video.append(keypoint_dataset)
             output_images.append(output_images_input)
             crop_region = determine_crop_region(
             keypoints_with_scores, image_height, image_width)
             # bar.update(progress(frame_idx, num_frames-1))
-        #   output_images.append(draw_prediction_on_image(
+        # output_images.append(draw_prediction_on_image(
         #       image[frame_idx, :, :, :].numpy().astype(np.int32),
         #       keypoints_with_scores, crop_region=None,
         #       close_figure=True, output_image_height=300))
@@ -132,12 +166,14 @@ def process_videos(input_folder, output_folder, fps=30):
             'keypoints': skel_per_video
         }
 
-        skel_frame_idx += 1
-
         # 스켈레톤 데이터 저장 ----- 유사도 판단단
-        save_skel_to_json(skel_output,skel_output_folder,skel_frame_idx)
-        
-        
+        save_skel_to_json(skel_output,skel_output_folder,video_idx)
+        # video_idx +=1
+
+    skel_filename = os.path.join(skel_output_folder, f'skel_data_{video_idx:03d}.json')
+
+
+    train(output_folder,skel_filename)
         
         # labeling(video_file,skel_per_video)
 
@@ -160,22 +196,33 @@ def process_video_infer(video_path, output_folder, fps=30):
     print(f"Original FPS: {original_fps}")
 
     # 프레임을 저장할 리스트 초기화
+    
+    
     frames = []
+    frames_128 = []
 
     # 비디오의 모든 프레임을 읽기
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
             break
+
+
+        frame_128 = cv2.resize(frame, (128, 128))  # 프레임 크기 조정
+
         # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_128 = cv2.cvtColor(frame_128, cv2.COLOR_BGR2RGB)
+
         frames.append(frame)
+        frames_128.append(frame_128)
 
     # 비디오 캡처 객체 해제
     cap.release()
 
     # NumPy 배열로 변환
     frames_np = np.array(frames)
+    frames_128_np = np.array(frames_128)
 
     # ✅ 프레임이 비어있는 경우 예외 처리 추가
     if frames_np.size == 0:
@@ -184,42 +231,64 @@ def process_video_infer(video_path, output_folder, fps=30):
 
     # TensorFlow 텐서로 변환
     image = tf.convert_to_tensor(frames_np, dtype=tf.uint8)
+    # image_128 = tf.convert_to_tensor(frames_128_np, dtype=tf.uint8)
 
     # 텐서 모양 확인
     num_frames, image_height, image_width, channels = image.shape
+    # num_frames_128, image_height_128, image_width_128, channels_128 = image_128.shape
     print(f"Processing video: {video_path}")
     print(f"Number of frames: {num_frames}, Image height: {image_height}, Image width: {image_width}, Channels: {channels}")
 
     # Crop 영역 설정
     crop_region = init_crop_region(image_height, image_width)
+    # crop_region_128 = init_crop_region(image_height_128, image_width_128)
 
     output_images = []
+
+    skel_datasetof2 = []
     skel_dataset = []
+    
 
     for frame_idx in range(num_frames):
-        keypoint_dataset = []
+        keypoint_datasetof2 = [] # 영상 저장
+        keypoint_dataset = [] # 유사도 저장장
 
         # 키포인트 추론 수행
         keypoints_with_scores = run_inference(
             movenet, image[frame_idx, :, :, :], crop_region,
             crop_size=[input_size, input_size]
         )
+        # # 키포인트 추론 수행
+        # keypoints_with_scores_128 = run_inference(
+        #     movenet, image_128[frame_idx, :, :, :], crop_region_128,
+        #     crop_size=[input_size, input_size]
+        # )
+
 
         # 키포인트 시각화 및 데이터 추출
-        keypoint_xy, output_image = draw_prediction_on_image(
+        keypoint_xy, output_image, keypoint_scores = draw_prediction_on_image(
             image[frame_idx, :, :, :].numpy().astype(np.int32),
             keypoints_with_scores, crop_region=None,
             close_figure=True, output_image_height=300
         )
+
+        # # 키포인트 시각화 및 데이터 추출
+        # keypoint_xy_128, output_image_128, keypoint_scores_128 = draw_prediction_on_image(
+        #     image_128[frame_idx, :, :, :].numpy().astype(np.int32),
+        #     keypoints_with_scores_128, crop_region=None,
+        #     close_figure=True, output_image_height=300
+        # )
 
         # 키포인트 데이터 저장
         if keypoint_xy is not None and keypoint_xy.shape[0] == 17: 
             for keypoint_dict_idx in range(len(keypoint_xy)):
                 for keypoint_xy_idx in range(len(keypoint_xy[0])):
                     keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-                    
-        if len(keypoint_dataset) == 34:
-            skel_dataset.append(keypoint_dataset)
+                    keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
+                keypoint_dataset.append(keypoint_scores[keypoint_dict_idx])
+
+            skel_dataset.append(keypoint_dataset) # keypoint_dataset : [51개]
+            skel_datasetof2.append(keypoint_datasetof2)
         output_images.append(output_image)
 
         # 새로운 crop_region 업데이트
@@ -227,8 +296,142 @@ def process_video_infer(video_path, output_folder, fps=30):
             keypoints_with_scores, image_height, image_width
         )
 
-    
-    return skel_dataset, output_images
+    # skel_dataset : [[51], [51], ... 프레임 개수만큼 ]
+    return skel_dataset,skel_datasetof2, output_images ,num_frames
+
+def release_capture(input_folder, output_folder, fps=30):
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    video_files = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
+    video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))  # 숫자로 정렬
+    print(f"현재 폴더의 비디오 개수: {len(video_files)}")
+    video_idx = 52
+    for video_file in video_files:
+        print(f"Processing {video_file}...")
+        video_path = os.path.join(input_folder, video_file)
+
+        cap = cv2.VideoCapture(video_path)
+        fps = cap.get(cv2.CAP_PROP_FPS)  # FPS 가져오기
+        print(f"Original FPS: {fps}")
+
+        max_distance = -10000
+        max_distance_frame = None
+        max_distance_keypoints = None
+        
+        frame_idx = 0
+        avg_distance_last_4 = 0
+        frames = []
+        distance_list = []
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret:
+                break
+
+            # frame = cv2.resize(frame, (640, 640))  # 프레임 크기 조정
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # RGB 변환
+
+            # TensorFlow 텐서 변환
+            image = tf.convert_to_tensor(frame, dtype=tf.uint8)
+            image_height, image_width, channels = image.shape
+            crop_region = init_crop_region(image_height, image_width)
+            keypoints_with_scores = run_inference(movenet, image, crop_region, crop_size=[input_size, input_size])
+
+            # Keypoint 데이터 처리
+            keypoint_xy, _ = draw_prediction_on_image(
+                image.numpy().astype(np.int32),
+                keypoints_with_scores, crop_region=None,
+                close_figure=True, output_image_height=300
+            )
+            print(keypoint_xy.shape)
+            # 🔥 17개의 keypoint가 있는 경우만 처리
+            if keypoint_xy is not None and keypoint_xy.shape[0] == 17:
+                # 🔥 왼쪽/오른쪽 발목 위치
+                
+                left_foot = np.array(keypoint_xy[16][0])
+                right_foot = np.array(keypoint_xy[15][0])
+                foot = np.array([left_foot, right_foot])
+                min_foot = np.minimum(left_foot, right_foot)
+                shoulder =  np.array([keypoint_xy[5][0], keypoint_xy[6][0]])
+                shoulder_avg = np.average(shoulder)
+                ankle_left = np.array([keypoint_xy[15][0], keypoint_xy[15][1]])  # Keypoint 15 (왼쪽 발목)
+                ankle_right = np.array([keypoint_xy[16][0], keypoint_xy[16][1]])  # Keypoint 16 (오른쪽 발목)
+                # distance = np.linalg.norm(ankle_left - ankle_right)  # 두 발목 거리 계산
+                distance = abs(left_foot - right_foot)
+                distance_list.append(distance)
+                if len(distance_list) > 6: distance_list.pop(0)  # 가장 오래된 값 제거
+
+                # 🔥 4개 이상 쌓였을 때 평균 계산
+                if len(distance_list) == 6: avg_distance_last_4 = np.mean(distance_list)
+                print(f"{frame_idx} 번째 프레임에서 발 간격 평균 : {avg_distance_last_4}")
+
+                cv2.putText(frame, str(f"{frame_idx} : {distance}"), (0, 50), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 255), 2)
+                frames.append(frame)
+
+                # 🔥 현재 프레임이 가장 큰 거리라면 갱신
+                if avg_distance_last_4 > max_distance:
+                    max_distance = avg_distance_last_4
+                    max_distance_frame = frame  # 가장 넓은 프레임 저장
+                    max_distance_keypoints = keypoint_xy #[coord for keypoint in keypoint_xy for coord in keypoint]  # 34개 값 저장
+
+            frame_idx += 1
+
+        cap.release()
+        # 🔥 스켈레톤 데이터가 없으면 스킵
+        if max_distance_frame is None or max_distance_keypoints is None:
+            print(f"No valid keypoint data for {video_file}. Skipping...")
+            continue
+
+        print(f"가장 넓은 발 간격 프레임: {max_distance}")
+
+        # ✅ **이미지 저장**
+        release_image_folder = os.path.join(output_folder, "release_images")
+        os.makedirs(release_image_folder, exist_ok=True)
+        # to_mp4(frames, fps=30, input_file_path="C:\\Users\\SSAFY\\code\\PJT\\S12P11B202\\AI\\posture_correct\\release_images\\test.mp4", output_folder=output_folder)
+        frame_bgr = cv2.cvtColor(max_distance_frame, cv2.COLOR_RGB2BGR)  # 다시 BGR 변환 (OpenCV 저장용)
+        frame_path = os.path.join(release_image_folder, f"video{video_idx}.jpg")
+        cv2.imwrite(frame_path, frame_bgr)  # 이미지 저장
+        print(f"✅ 저장된 이미지: {frame_path}")
+
+        # ✅ **JSON 저장**
+        dataset = []
+        dataset.append(max_distance_keypoints)
+        save_to_json(np.array(dataset))
+        video_idx += 1
+    return max_distance_keypoints
+
+
+
+
+def release_capture_for_infer(skel_list, fps=30):
+        
+        max_distance = -10000
+        max_distance_keypoints = None
+
+        frame_idx = 0
+        avg_distance_last_4 = 0
+        distance_list = []
+        for skel in skel_list:
+                frame_idx += 1
+                # 🔥 왼쪽/오른쪽 발목 위치
+                left_foot = np.array(skel[32])
+                right_foot = np.array(skel[30])
+                distance = abs(left_foot - right_foot)
+                distance_list.append(distance)
+                if len(distance_list) > 5: distance_list.pop(0)  # 가장 오래된 값 제거
+
+                # 🔥 4개 이상 쌓였을 때 평균 계산
+                if len(distance_list) == 5: avg_distance_last_4 = np.mean(distance_list)
+
+                print(f"{frame_idx} 번째 프레임에서 발 거리: {distance}")
+
+                # 🔥 현재 프레임이 가장 큰 거리라면 갱신
+                if avg_distance_last_4 > max_distance:
+                    max_distance = avg_distance_last_4
+                    max_distance_keypoints = skel #[coord for keypoint in keypoint_xy for coord in keypoint]  # 34개 값 저장
+            
+        
+        return max_distance_keypoints
 
 def to_mp4(images, fps, input_file_path, output_folder):
     print("IN to_mp4 --- ")
