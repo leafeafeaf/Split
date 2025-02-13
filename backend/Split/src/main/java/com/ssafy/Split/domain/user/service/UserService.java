@@ -228,7 +228,19 @@ public class UserService {
       user.setAvgBowlingScore(updateRequest.getAvgBowlingScore());
     }
 
-    userRepository.save(user); // 변경사항 저장
+
+        String nickname = updateRequest.getNickname();
+        //이름이 변경되었다면 중복확인
+        if(!nickname.equals(user.getNickname())){
+            if(userRepository.existsByNickname(nickname)) throw new SplitException(ErrorCode.USER_ALREADY_EXISTS,"nickname",nickname);
+        }
+
+        user.updateUser(user, updateRequest);
+
+        userRepository.save(user); // 변경사항 저장
+
+    }
 
   }
+
 }

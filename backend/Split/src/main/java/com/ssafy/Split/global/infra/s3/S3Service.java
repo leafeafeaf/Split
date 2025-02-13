@@ -2,6 +2,8 @@ package com.ssafy.Split.global.infra.s3;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.ssafy.Split.global.common.exception.ErrorCode;
 import com.ssafy.Split.global.common.exception.SplitException;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,22 @@ public class S3Service {
             log.error("Error deleting file from S3: {}", fileUrl, e);
             throw new SplitException(ErrorCode.S3_DELETE_ERROR);
         }
+    }
+    public void removeExpiration(String fileUrl) {
+        // fileUrl에서 S3 키 추출
+        String fileKey = extractKeyFromUrl(fileUrl);
+
+        // 기존 객체의 메타데이터 가져오기
+        ObjectMetadata metadata = amazonS3.getObjectMetadata(bucket, fileKey);
+
+        // 기존 메타데이터에서 Expiration 제거
+        metadata.setExpirationTime(null); // 유효기간 제거
+
+        // 새로운 메타데이터로 덮어쓰기 (S3에서는 직접 변경이 안되므로 Copy 작업 수행)
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(bucket, fileKey, bucket, fileKey)
+                .withNewObjectMetadata(metadata);
+
+        amazonS3.copyObject(copyObjectRequest);
     }
 
     private String extractKeyFromUrl(String fileUrl) {

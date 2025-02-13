@@ -115,8 +115,8 @@ public class SecurityConfig {
         http.addFilterBefore(new ExceptionFilter(objectMapper), JWTFilter.class);
 
         //원래있던 로그인필터 자리에 새롭게 커스텀한 로그인 필터를 넣어라
-        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), JWTService,jwtUtil,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new CustomLogoutFilter(JWTService), LogoutFilter.class);
+        http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), JWTService,jwtUtil,objectMapper,accessTime,refreshTime), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomLogoutFilter(JWTService,objectMapper), LogoutFilter.class);
 
         //세션 설정
         http.sessionManagement((session) -> session
