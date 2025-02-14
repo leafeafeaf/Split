@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react"
 import { useAppDispatch, useAppSelector } from "@/app/store/hooks"
-import { fetchRankings } from "@/app/features/rankingSlice"
+import { fetchRankings, clearRankings } from "@/app/features/rankingSlice"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { UserMenu } from "@/components/user-menu"
 import { NavigationBar } from "@/components/navigation-bar"
@@ -16,39 +16,34 @@ const PAGE_SIZE = 20
 
 export default function RankingPage() {
   const dispatch = useAppDispatch()
-  const { rankings, isLoading, error } = useAppSelector((state) => state.ranking)
+  const { rankings, isLoading, error, hasMore } = useAppSelector((state) => state.ranking)
   const [sortField, setSortField] = useState<SortField>("poseHighscore")
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
   const [page, setPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
 
-  useEffect(() => {
+  const fetchRankingsData = useCallback(() => {
     dispatch(fetchRankings({ sortField, sortOrder, page, pageSize: PAGE_SIZE }))
   }, [dispatch, sortField, sortOrder, page])
 
+  useEffect(() => {
+    fetchRankingsData()
+  }, [fetchRankingsData])
+
   const loadMoreRankings = useCallback(() => {
     if (!isLoading && hasMore) {
-      setPage((prev) => {
-        const nextPage = prev + 1
-        dispatch(fetchRankings({ sortField, sortOrder, page: nextPage, pageSize: PAGE_SIZE }))
-        return nextPage
-      })
+      setPage((prevPage) => prevPage + 1)
     }
-  }, [isLoading, hasMore, dispatch, sortField, sortOrder])
+  }, [isLoading, hasMore])
 
   const handleSortFieldChange = (field: SortField) => {
     if (field === sortField) {
-      // If clicking the same field, toggle sort order
       setSortOrder(sortOrder === "asc" ? "desc" : "asc")
     } else {
-      // If clicking a different field, set it as new sort field
       setSortField(field)
-      setSortOrder("desc") // Default to descending order
+      setSortOrder("desc")
     }
-    // Reset pagination and fetch data again
     setPage(1)
-    //setRankings([])  //No need to reset rankings as it's managed by Redux
-    dispatch(fetchRankings({ sortField, sortOrder, page: 1, pageSize: PAGE_SIZE }))
+    dispatch(clearRankings())
   }
 
   // Find current user's ranking (set to null when user is not authenticated)
