@@ -82,7 +82,6 @@ public class GameService {
         game.getPoseAvgscore(),
         user.getTotalGameCount()
     ));
-
     user.setElbowAngleScore(calculateNewAverage(
         user.getElbowAngleScore(),
         game.getElbowAngleScore(),
@@ -94,7 +93,6 @@ public class GameService {
         game.getArmStabilityScore(),
         user.getTotalGameCount()
     ));
-
     user.setArmSpeedScore(calculateNewAverage(
         user.getArmSpeedScore(),
         game.getArmSpeed(),
@@ -102,6 +100,7 @@ public class GameService {
     ));
 
     user.setAvgBowlingScore(calculateIntegerAverage(
+        user.getTotalGameCount(),
         user.getAvgBowlingScore(),
         game.getBowlingScore()
     ));
@@ -122,13 +121,14 @@ public class GameService {
   }
 
   // Integer 타입 평균 계산
-  private int calculateIntegerAverage(int currentAvg, int newValue) {
-    return (currentAvg + newValue) / 2;  // 단순히 두 값의 평균을 계산
+  private int calculateIntegerAverage(int totalGameCnt, int currentAvg, int newValue) {
+    return ((currentAvg * totalGameCnt) + newValue) / (totalGameCnt + 1);  // 단순히 두 값의 평균을 계산
   }
 
   // BigDecimal 타입 평균 계산 (다른 BigDecimal 필드들용)
   private BigDecimal calculateNewAverage(BigDecimal currentAvg, BigDecimal newValue,
       int currentCount) {
+    log.info("currentcnt : {}", currentCount);
     return currentAvg.multiply(BigDecimal.valueOf(currentCount))
         .add(newValue)
         .divide(BigDecimal.valueOf(currentCount + 1), 2, RoundingMode.HALF_DOWN);
