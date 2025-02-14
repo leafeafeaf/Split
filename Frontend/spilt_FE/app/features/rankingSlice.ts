@@ -17,6 +17,7 @@ const initialState: RankingState = {
 
 export const fetchRankings = createAsyncThunk("ranking/fetchRankings", async (_, { rejectWithValue }) => {
   try {
+    // This is a public endpoint, no auth needed
     const response = await api.get("rank")
     if (response.data.code === "SUCCESS") {
       return response.data.data
