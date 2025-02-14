@@ -2,6 +2,10 @@ package com.ssafy.Split.global.common.batch.scheduler;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,25 +13,23 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @AllArgsConstructor
 public class RankingBatchScheduler {
-//
-//  private final JobLauncher jobLauncher;
-//  private final Job rankUpdateJob;
 
-  @Scheduled(cron = "*/5 * * * * *")  // 30초마다 실행
+  private final JobLauncher jobLauncher;
+  private final Job rankUpdateJob;
+
+  @Scheduled(cron = "*/30 * * * * *")  // 30초마다 실행
   public void runRankingJob() {
     log.info("#########################################30초");
+    try {
+      JobParameters jobParameters = new JobParametersBuilder()
+          .addLong("time", System.currentTimeMillis())
+          .toJobParameters();
+      jobLauncher.run(rankUpdateJob, jobParameters);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }
-//    try {
-//      JobParameters jobParameters = new JobParametersBuilder()
-//          .addLong("time", System.currentTimeMillis())
-//          .toJobParameters();
-//      jobLauncher.run(rankUpdateJob, jobParameters);
-//    } catch (Exception e) {
-//      e.printStackTrace();
-//    }
-//  }
 
-//}
 
 
