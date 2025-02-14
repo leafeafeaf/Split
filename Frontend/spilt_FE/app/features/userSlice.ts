@@ -57,6 +57,32 @@ export const checkNickname = createAsyncThunk("user/checkNickname", async (nickn
   }
 })
 
+export const updateHighlight = createAsyncThunk(
+  "user/updateHighlight",
+  async ({ highlight, isUpdate }: { highlight: string; isUpdate: boolean }, { rejectWithValue }) => {
+    try {
+      // This endpoint requires authentication, interceptor will handle it
+      const response = await api({
+        method: isUpdate ? "patch" : "post",
+        url: "user/highlight",
+        data: { highlight },
+      })
+
+      if (response.data.code === "SUCCESS") {
+        return highlight
+      }
+      return rejectWithValue("Failed to update highlight")
+    } catch (error: any) {
+      if (error.response?.status === 400) {
+        if (error.response.data.code === "INVALID_VIDEO_URL") {
+          return rejectWithValue("Invalid video URL format")
+        }
+      }
+      return rejectWithValue(error.response?.data?.message || "Failed to update highlight")
+    }
+  },
+)
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -79,6 +105,21 @@ export const userSlice = createSlice({
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false
+        state.error = action.payload as string
+      })
+      .addCase(updateHighlight.pending, (state) => {
+        state.highlightUpdateLoading = true
+        state.error = null
+      })
+      .addCase(updateHighlight.fulfilled, (state, action: PayloadAction<string>) => {
+        state.highlightUpdateLoading = false
+        if (state.user) {
+          state.user.highlight = action.payload
+        }
+        state.error = null
+      })
+      .addCase(updateHighlight.rejected, (state, action) => {
+        state.highlightUpdateLoading = false
         state.error = action.payload as string
       })
   },
