@@ -70,7 +70,7 @@ public class SecurityConfig {
                 ));
 
                 configuration.setAllowedMethods(Collections.singletonList("*"));
-                configuration.setAllowCredentials(true);
+                configuration.setAllowCredentials(false);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
                 configuration.setMaxAge(3600L);
 
