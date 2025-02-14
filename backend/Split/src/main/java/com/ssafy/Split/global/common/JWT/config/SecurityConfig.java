@@ -63,14 +63,12 @@ public class SecurityConfig {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                String origin = request.getHeader("Origin"); // 요청한 Origin 가져오기
-                if (origin != null) {
-                    configuration.setAllowedOrigins(Collections.singletonList(origin)); // 요청한 Origin 허용
-                }
-//                configuration.setAllowedOrigins(Arrays.asList(
-//                        "https://i12b202.p.ssafy.io/",
-//                        "http://i12b202.p.ssafy.io/"
-//                ));
+                configuration.setAllowedOrigins(Arrays.asList(
+                        "https://i12b202.p.ssafy.io/",
+                        "http://i12b202.p.ssafy.io/",
+                        "https://kzmq3270eiymkk2i0swj.lite.vusercontent.net/",
+                        "http://14.50.47.47:3000"
+                ));
 
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
