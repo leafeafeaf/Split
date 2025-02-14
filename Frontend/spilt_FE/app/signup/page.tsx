@@ -111,7 +111,7 @@ export default function SignUpPage() {
       formDataToSend.append("gender", GENDER_MAP[formData.gender].toString())
       formDataToSend.append("height", formData.height)
 
-      const response = await api.post("/user", formDataToSend, {
+      const response = await api.post("user", formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

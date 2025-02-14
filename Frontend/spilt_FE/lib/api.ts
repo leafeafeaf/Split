@@ -3,8 +3,10 @@ import { store } from "@/app/store/store"
 import { clearTokens, reissueTokens } from "@/app/features/authSlice"
 import { clearUser } from "@/app/features/userSlice"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://i12b202.p.ssafy.io/api"
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -21,6 +23,11 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`
     }
 
+    // Ensure the URL starts with the base URL
+    if (!config.url?.startsWith("http")) {
+      config.url = config.url?.startsWith("/") ? config.url.slice(1) : config.url
+    }
+
     return config
   },
   (error) => {
@@ -34,7 +41,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
 
-    // Prevent infinite loops
     if (originalRequest._retry) {
       return Promise.reject(error)
     }
@@ -47,14 +53,9 @@ api.interceptors.response.use(
           try {
             originalRequest._retry = true
             const result = await store.dispatch(reissueTokens()).unwrap()
-
-            // Update the original request with new token
             originalRequest.headers.Authorization = `Bearer ${result.accessToken}`
-
-            // Retry the original request
             return api(originalRequest)
           } catch (refreshError) {
-            // If token refresh fails, logout user
             store.dispatch(clearTokens())
             store.dispatch(clearUser())
             window.location.href = "/login"
@@ -63,7 +64,6 @@ api.interceptors.response.use(
 
         case "INVALID_TOKEN":
         case "TOKEN_MISSING":
-          // Clear auth state and redirect to login
           store.dispatch(clearTokens())
           store.dispatch(clearUser())
           window.location.href = "/login"

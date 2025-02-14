@@ -32,7 +32,7 @@ export default function LoginPage() {
       formDataToSend.append("email", formData.email)
       formDataToSend.append("password", formData.password)
 
-      const response = await api.post("/login", formDataToSend, {
+      const response = await api.post("login", formDataToSend, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

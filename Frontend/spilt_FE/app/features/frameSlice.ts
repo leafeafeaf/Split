@@ -21,7 +21,7 @@ const initialState: FrameState = {
 
 export const fetchFrames = createAsyncThunk("frame/fetchFrames", async (serial: string, { rejectWithValue }) => {
   try {
-    const response = await api.get(`/device/${serial}/frame`)
+    const response = await api.get(`device/${serial}/frame`)
     if (response.data.code === "SUCCESS") {
       return response.data.data
     }
@@ -38,7 +38,7 @@ export const uploadFrame = createAsyncThunk(
   "frame/uploadFrame",
   async ({ serial, frameData }: { serial: string; frameData: FrameUploadData }, { dispatch, rejectWithValue }) => {
     try {
-      const response = await api.post(`/device/${serial}/frame`, frameData)
+      const response = await api.post(`device/${serial}/frame`, frameData)
 
       if (response.data.code === "SUCCESS") {
         // After successful upload, fetch updated frame list
@@ -77,7 +77,7 @@ export const fetchSingleFrame = createAsyncThunk(
   "frame/fetchSingleFrame",
   async ({ serial, frameNum }: { serial: string; frameNum: number }, { rejectWithValue }) => {
     try {
-      const response = await api.get(`/device/${serial}/frame/${frameNum}`)
+      const response = await api.get(`device/${serial}/frame/${frameNum}`)
       if (response.data.code === "SUCCESS") {
         return response.data.data
       }
