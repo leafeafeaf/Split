@@ -64,8 +64,9 @@ public class SecurityConfig {
                 CorsConfiguration configuration = new CorsConfiguration();
 
                 configuration.setAllowedOrigins(Arrays.asList(
-                        "https://i12b202.p.ssafy.io/",
-                        "http://i12b202.p.ssafy.io/"
+                        "*"
+//                        "https://i12b202.p.ssafy.io/",
+//                        "http://i12b202.p.ssafy.io/"
                 ));
 
                 configuration.setAllowedMethods(Collections.singletonList("*"));
