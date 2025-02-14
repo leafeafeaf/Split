@@ -7,23 +7,26 @@ const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "https://i12b202.p.ssafy
 
 // Define endpoints that don't require authentication
 const PUBLIC_ENDPOINTS = [
-  "/login",
-  "/user/check-nickname",
-  "/user", // POST (signup) doesn't need auth
-  "/reissue",
-  "/rank",
+  "login",
+  "user/check-nickname",
+  "user", // POST (signup) doesn't need auth
+  "reissue",
+  "rank",
 ]
 
 // Helper function to check if the endpoint needs authentication
 const requiresAuth = (url: string) => {
+  // Remove leading slash if present
+  const trimmedUrl = url.startsWith("/") ? url.slice(1) : url
+
   // Check if the URL matches any of the public endpoints
   return !PUBLIC_ENDPOINTS.some((endpoint) => {
     // For exact matches
-    if (url === endpoint) return true
-    // For endpoints with parameters (e.g., /user/check-nickname/{nickname})
-    if (endpoint.includes("check-nickname") && url.startsWith("/user/check-nickname/")) return true
+    if (trimmedUrl === endpoint) return true
+    // For endpoints with parameters (e.g., user/check-nickname/{nickname})
+    if (endpoint.includes("check-nickname") && trimmedUrl.startsWith("user/check-nickname/")) return true
     // Special case for /user endpoint - only POST (signup) is public
-    if (endpoint === "/user") {
+    if (endpoint === "user") {
       // Get the request method from the config when available
       const method = axios.defaults.method || "get"
       return method.toLowerCase() === "post"
@@ -43,22 +46,17 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Ensure URL is properly formatted for checking
-    const url = config.url?.startsWith("/") ? config.url : `/${config.url}`
+    // Remove leading slash if present
+    const url = config.url?.startsWith("/") ? config.url.slice(1) : config.url
 
     // Only add Authorization header for endpoints that require authentication
-    if (requiresAuth(url)) {
+    if (requiresAuth(url || "")) {
       const state = store.getState()
       const accessToken = state.auth.accessToken
 
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`
       }
-    }
-
-    // Ensure the URL starts with the base URL
-    if (!config.url?.startsWith("http")) {
-      config.url = config.url?.startsWith("/") ? config.url.slice(1) : config.url
     }
 
     return config
