@@ -16,32 +16,54 @@ const initialState: AuthState = {
   error: null,
 }
 
-export const reissueTokens = createAsyncThunk("auth/reissueTokens", async (_, { rejectWithValue }) => {
+export const login = createAsyncThunk(
+  "auth/login",
+  async (credentials: { email: string; password: string }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("login", credentials)
+      if (response.data.code === "SUCCESS") {
+        return {
+          accessToken: response.headers["authorization"],
+          refreshToken: response.headers["refresh-token"],
+        }
+      }
+      return rejectWithValue("Login failed")
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Login failed")
+    }
+  },
+)
+
+export const logout = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
   try {
-    // No need to manually add Authorization header here as it's a public endpoint
-    const response = await api.post("reissue")
+    await api.post("logout")
+    return true
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data?.message || "Logout failed")
+  }
+})
+
+export const reissueTokens = createAsyncThunk("auth/reissueTokens", async (_, { getState, rejectWithValue }) => {
+  try {
+    const state = getState() as { auth: AuthState }
+    const response = await api.post(
+      "reissue",
+      {},
+      {
+        headers: {
+          "Refresh-Token": state.auth.refreshToken,
+        },
+      },
+    )
     if (response.data.code === "SUCCESS") {
       return {
         accessToken: response.headers["authorization"],
         refreshToken: response.headers["refresh-token"],
       }
     }
-    return rejectWithValue("Failed to reissue tokens")
+    return rejectWithValue("Token reissue failed")
   } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || "Failed to reissue tokens")
-  }
-})
-
-export const logout = createAsyncThunk("auth/logout", async (_, { getState, rejectWithValue }) => {
-  try {
-    // This endpoint requires authentication, but our interceptor will handle it
-    const response = await api.post("logout")
-    if (response.data.code === "SUCCESS") {
-      return true
-    }
-    return rejectWithValue("Failed to logout")
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || "Failed to logout")
+    return rejectWithValue(error.response?.data?.message || "Token reissue failed")
   }
 })
 
@@ -61,24 +83,27 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(reissueTokens.pending, (state) => {
+      .addCase(login.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(reissueTokens.fulfilled, (state, action) => {
+      .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false
         state.accessToken = action.payload.accessToken
         state.refreshToken = action.payload.refreshToken
         state.error = null
       })
-      .addCase(reissueTokens.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.payload as string
       })
       .addCase(logout.fulfilled, (state) => {
         state.accessToken = null
         state.refreshToken = null
-        state.error = null
+      })
+      .addCase(reissueTokens.fulfilled, (state, action) => {
+        state.accessToken = action.payload.accessToken
+        state.refreshToken = action.payload.refreshToken
       })
   },
 })

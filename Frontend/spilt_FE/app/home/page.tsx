@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useAppSelector } from "@/app/store/hooks"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import { UserMenu } from "@/components/user-menu"
 import { NavigationBar } from "@/components/navigation-bar"
@@ -9,15 +9,14 @@ import { ScoreChart } from "@/components/charts/score-chart"
 import { StatsSection } from "@/components/statistics/stats-section"
 import { BowlingStats } from "@/components/statistics/bowling-stats"
 import { HighlightPlayer } from "@/components/video/highlight-player"
-import { useUserStore } from "@/lib/user"
 import { Card } from "@/components/ui/card"
 
 export default function HomePage() {
-  const { user, isLoading, fetchUser } = useUserStore()
+  const { user, isLoading } = useAppSelector((state) => state.user)
 
-  useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
+  // useEffect(() => {
+  //   fetchUser()
+  // }, [fetchUser])
 
   if (isLoading) {
     return (
