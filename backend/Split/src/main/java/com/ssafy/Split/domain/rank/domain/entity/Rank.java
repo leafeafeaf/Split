@@ -56,10 +56,10 @@ public class Rank {
   @DecimalMax("100.00")
   private BigDecimal poseHighscore = BigDecimal.ZERO;
 
-  @Column(name = "pose_losescore", nullable = false)
+  @Column(name = "pose_lowscore", nullable = false)
   @DecimalMin("0.00")
   @DecimalMax("100.00")
-  private BigDecimal poseLosescore = BigDecimal.ZERO;
+  private BigDecimal poseLowscore = BigDecimal.ZERO;
 
   @Column(name = "pose_avgscore", nullable = false)
   @DecimalMin("0.00")
@@ -81,7 +81,7 @@ public class Rank {
 
   @Builder
   public Rank(Game game, User user, String nickname, String highlight, Integer totalGameCount,
-      LocalDateTime gameDate, BigDecimal poseHighscore, BigDecimal poseLosescore,
+      LocalDateTime gameDate, BigDecimal poseHighscore, BigDecimal poseLowscore,
       BigDecimal poseAvgscore, BigDecimal elbowAngleScore, BigDecimal armStabilityScore,
       BigDecimal armSpeed) {
     this.game = game;
@@ -91,7 +91,7 @@ public class Rank {
     this.totalGameCount = totalGameCount;
     this.gameDate = gameDate;
     this.poseHighscore = poseHighscore;
-    this.poseLosescore = poseLosescore;
+    this.poseLowscore = poseLowscore;
     this.poseAvgscore = poseAvgscore;
     this.elbowAngleScore = elbowAngleScore;
     this.armStabilityScore = armStabilityScore;

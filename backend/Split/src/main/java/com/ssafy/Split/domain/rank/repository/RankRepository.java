@@ -19,8 +19,7 @@ public interface RankRepository extends JpaRepository<Rank, RankId> {
    * 기존 랭킹 데이터 삭제
    */
   @Modifying
-  @Transactional
-  @Query("DELETE FROM Rank")
-  void deleteAllRanks();
+  @Query(value = "TRUNCATE TABLE game_rank", nativeQuery = true)
+  void truncateRankTable();
 
 }

@@ -14,21 +14,22 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class RankingBatchScheduler {
 
-  private final JobLauncher jobLauncher;
-  private final Job rankUpdateJob;
+    private final JobLauncher jobLauncher;
+    private final Job rankUpdateJob;
 
-  @Scheduled(cron = "*/30 * * * * *")  // 30초마다 실행
-  public void runRankingJob() {
-    log.info("#########################################30초");
-    try {
-      JobParameters jobParameters = new JobParametersBuilder()
-          .addLong("time", System.currentTimeMillis())
-          .toJobParameters();
-      jobLauncher.run(rankUpdateJob, jobParameters);
-    } catch (Exception e) {
-      e.printStackTrace();
+    @Scheduled(cron = "0 * * * * *")  // 1분마다 실행
+    public void runRankingJob() {
+        log.info("#########################################1분");
+        try {
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .toJobParameters();
+            jobLauncher.run(rankUpdateJob, jobParameters);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        log.info("끝");
     }
-  }
 }
 
 
