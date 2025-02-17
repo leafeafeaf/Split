@@ -20,7 +20,7 @@ public class RankTableDeleteTasklet implements Tasklet {
   @Override
   @Transactional
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-    rankRepository.deleteAll();
+    rankRepository.truncateRankTable();
     return RepeatStatus.FINISHED;
   }
 }

@@ -5,6 +5,7 @@ import com.ssafy.Split.domain.game.domain.entity.Game;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,21 +21,35 @@ public interface GameRepository extends JpaRepository<Game, Integer> {
   /**
    * 최근 3개월 내 상위 5000명 게임 데이터 조회
    */
-  @Query("""
-          SELECT g FROM Game g
-          WHERE g.user.id IN (
-              SELECT g2.user.id FROM Game g2
-              WHERE g2.gameDate >= :oneYearAgo
-              AND g2.isSkip = false
-              GROUP BY g2.user.id
-              HAVING COUNT(g2.id) >= 5
-          )
-          AND g.poseAvgscore = (
-              SELECT MAX(g3.poseAvgscore) FROM Game g3 WHERE g3.user.id = g.user.id
-          )
-          ORDER BY g.poseAvgscore DESC
-          LIMIT 5000
-      """)
-  List<Game> findTopRankedGames(@Param("oneYearAgo") LocalDateTime oneYearAgo);
+  @Modifying
+  @Query(value = """
+    INSERT INTO game_rank (game_id, user_id, nickname, total_game_count, game_date,
+                           pose_highscore, pose_lowscore, pose_avgscore,
+                           elbow_angle_score, arm_stability_score, arm_speed)
+    SELECT g.id, g.user_id, u.nickname, u.total_game_count, g.game_date,
+           g.pose_highscore, g.pose_lowscore, g.pose_avgscore,
+           g.elbow_angle_score, g.arm_stability_score, g.arm_speed
+    FROM game g
+    JOIN user u ON g.user_id = u.id
+    WHERE g.user_id IN (
+        SELECT g2.user_id
+        FROM game g2
+        WHERE g2.game_date >= :oneYearAgo
+        AND g2.is_skip = false
+        GROUP BY g2.user_id
+        HAVING COUNT(g2.user_id) >= 5
+    )
+    AND g.pose_avgscore = (
+        SELECT MAX(g3.pose_avgscore)
+        FROM game g3
+        WHERE g3.user_id = g.user_id
+    )
+    ORDER BY g.pose_avgscore DESC
+""", nativeQuery = true)
+  void insertTopRankedGames(@Param("oneYearAgo") LocalDateTime oneYearAgo);
+
+
+
+
 
 }

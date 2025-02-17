@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface RankRepository extends JpaRepository<Rank, RankId> {
@@ -19,8 +18,7 @@ public interface RankRepository extends JpaRepository<Rank, RankId> {
    * 기존 랭킹 데이터 삭제
    */
   @Modifying
-  @Transactional
-  @Query("DELETE FROM Rank")
-  void deleteAllRanks();
+  @Query(value = "TRUNCATE TABLE game_rank", nativeQuery = true)
+  void truncateRankTable();
 
 }

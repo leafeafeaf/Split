@@ -27,7 +27,7 @@ public class RankService {
                         .totalGameCount(rank.getTotalGameCount())
                         .gameDate(rank.getGameDate().toString())
                         .poseHighscore(rank.getPoseHighscore())
-                        .poseLosescore(rank.getPoseLosescore())
+                        .poseLowscore(rank.getPoseLowscore())
                         .poseAvgscore(rank.getPoseAvgscore())
                         .elbowAngleScore(rank.getElbowAngleScore())
                         .armStabilityScore(rank.getArmStabilityScore())

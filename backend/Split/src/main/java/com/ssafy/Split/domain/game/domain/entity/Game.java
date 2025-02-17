@@ -2,6 +2,7 @@ package com.ssafy.Split.domain.game.domain.entity;
 
 import com.ssafy.Split.domain.rank.domain.entity.Rank;
 import com.ssafy.Split.domain.user.domain.entity.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -72,7 +73,7 @@ public class Game {
   @Column(name = "arm_speed", nullable = false)
   private BigDecimal armSpeed = BigDecimal.ZERO;
 
-  @OneToOne(mappedBy = "game")
+  @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
   private Rank rank;
 
   @Column(name = "bowling_score")

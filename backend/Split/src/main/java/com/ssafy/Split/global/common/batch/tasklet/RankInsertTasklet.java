@@ -1,11 +1,10 @@
 package com.ssafy.Split.global.common.batch.tasklet;
 
-import com.ssafy.Split.domain.game.domain.entity.Game;
 import com.ssafy.Split.domain.game.repository.GameRepository;
-import com.ssafy.Split.domain.rank.domain.entity.Rank;
 import com.ssafy.Split.domain.rank.repository.RankRepository;
 import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -14,39 +13,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
+@Transactional
+@Slf4j
+@RequiredArgsConstructor
 public class RankInsertTasklet implements Tasklet {
 
   private final GameRepository gameRepository;
   private final RankRepository rankRepository;
 
-  public RankInsertTasklet(GameRepository gameRepository, RankRepository rankRepository) {
-    this.gameRepository = gameRepository;
-    this.rankRepository = rankRepository;
-  }
-
   @Override
   @Transactional
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-    List<Game> topGames = gameRepository.findTopRankedGames(LocalDateTime.now());
 
-    topGames.forEach(game -> {
-      Rank rank = Rank.builder()
-          .game(game)
-          .user(game.getUser())
-          .nickname(game.getUser().getNickname())
-          .highlight(game.getUser().getHighlight())
-          .totalGameCount(game.getUser().getTotalGameCount())
-          .gameDate(game.getGameDate())
-          .poseHighscore(game.getPoseHighscore())
-          .poseLosescore(game.getPoseLowscore())
-          .poseAvgscore(game.getPoseAvgscore())
-          .elbowAngleScore(game.getElbowAngleScore())
-          .armStabilityScore(game.getArmStabilityScore())
-          .armSpeed(game.getArmSpeed())
-          .build();
+    LocalDateTime oneYearAgo = LocalDateTime.now().minusYears(1);
+    long rankCount = rankRepository.count();
+    log.info("저장하기 전 랭크 수: {}", rankCount);
 
-      rankRepository.save(rank);
-    });
+    // 기존 로직
+    gameRepository.insertTopRankedGames(oneYearAgo);
+
+    rankCount = rankRepository.count();
+    log.info("최종 저장된 랭크 수: {}", rankCount);
 
     return RepeatStatus.FINISHED;
   }
