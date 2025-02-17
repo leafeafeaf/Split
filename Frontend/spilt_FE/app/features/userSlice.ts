@@ -22,6 +22,7 @@ export const fetchUser = createAsyncThunk("user/fetchUser", async (_, { rejectWi
     // This endpoint requires authentication, but our interceptor will handle it
     const response = await api.get("user")
     if (response.data.code === "SUCCESS") {
+      console.log(response)
       return response.data.data
     }
     return rejectWithValue("Failed to fetch user data")
@@ -39,6 +40,7 @@ export const createUser = createAsyncThunk("user/createUser", async (userData: F
       },
     })
     if (response.data.code === "SUCCESS") {
+      console.log(response)
       return response.data.data
     }
     return rejectWithValue("Failed to create user")
@@ -69,6 +71,7 @@ export const updateHighlight = createAsyncThunk(
       })
 
       if (response.data.code === "SUCCESS") {
+        console.log(response)
         return highlight
       }
       return rejectWithValue("Failed to update highlight")

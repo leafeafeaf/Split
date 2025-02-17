@@ -22,8 +22,8 @@ export const reissueTokens = createAsyncThunk("auth/reissueTokens", async (_, { 
     const response = await api.post("reissue")
     if (response.data.code === "SUCCESS") {
       return {
-        accessToken: response.headers["authorization"],
-        refreshToken: response.headers["refresh-token"],
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
       }
     }
     return rejectWithValue("Failed to reissue tokens")

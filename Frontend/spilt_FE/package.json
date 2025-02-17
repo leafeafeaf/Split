@@ -66,9 +66,9 @@
     "use-sync-external-store": "latest",
     "framer-motion": "latest",
     "use-debounce": "latest",
-    "axios": "latest",
     "@reduxjs/toolkit": "latest",
-    "zustand": "latest"
+    "zustand": "latest",
+    "axios": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
