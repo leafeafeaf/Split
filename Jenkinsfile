@@ -62,7 +62,7 @@ pipeline {
         stage('Docker Build & Deploy') {
             steps {
                 script { 
-                    sh 'docker-compose down -v'
+                    sh 'docker-compose down'
                     sh '''
                         # Bash 사용하도록 변경
                         bash -c '
