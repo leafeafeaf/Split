@@ -75,6 +75,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .timestamp(LocalDateTime.now().toString())
                 .build();
 
+        log.info("로그인 성공 - id : {}, email : {}",id,email);
+
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
@@ -83,6 +85,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     //로그인 실패
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.info("로그인 실패");
         throw new SplitException(ErrorCode.INVALID_CREDENTIALS);
     }
 }

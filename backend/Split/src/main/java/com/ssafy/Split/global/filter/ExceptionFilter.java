@@ -10,8 +10,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @RequiredArgsConstructor
 public class ExceptionFilter extends OncePerRequestFilter {
 
@@ -40,9 +42,8 @@ public class ExceptionFilter extends OncePerRequestFilter {
       status = splitException.getErrorCode().getStatus();
       errorResponse = ErrorResponse.of(splitException.getErrorCode(), splitException.getArgs());
     } else {
+      log.error("서버 오류");
       status = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-      
-      e.printStackTrace();
       errorResponse = new ErrorResponse(
           "E999",
           status,

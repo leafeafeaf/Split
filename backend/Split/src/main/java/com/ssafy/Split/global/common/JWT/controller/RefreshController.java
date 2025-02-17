@@ -8,12 +8,14 @@ import com.ssafy.Split.global.common.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 public class RefreshController {
@@ -27,7 +29,7 @@ public class RefreshController {
                     .orElseThrow(() -> new SplitException(ErrorCode.TOKEN_MISSING,"refresh"));
 
             String token = JWTService.reissue(refreshToken,response);
-
+            log.info("토큰 재발급");
             return ResponseEntity.ok().header("Authorization", token).
                     body(ApiResponse.builder()
                             .code("SUCCESS")
