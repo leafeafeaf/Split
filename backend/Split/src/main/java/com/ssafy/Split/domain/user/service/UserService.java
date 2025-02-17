@@ -41,7 +41,6 @@ public class UserService {
     user.updateHighlight(null);
     userRepository.save(user);
 
-    log.info("Highlight deleted for user: {}", userId);
   }
 
   public void createHighlight(Integer userId, String highlight) {
@@ -61,8 +60,6 @@ public class UserService {
     user.createHighlight(highlight);
     userRepository.save(user);
     s3Service.updateObjectTag(highlight, "FOREVER");
-
-    log.info("Highlight created for user {}: {}", userId, highlight);
 
 
   }
@@ -88,7 +85,6 @@ public class UserService {
 
     s3Service.updateObjectTag(highlight, "FOREVER");
 
-    log.info("Highlight updated for user {}: {}", userId, highlight);
   }
 
   /**
@@ -100,7 +96,6 @@ public class UserService {
         .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
     user.updateThema(thema);
-    log.info("User {} thema updated to {}", userId, thema);
   }
 
   private boolean isValidVideoUrl(String url) {

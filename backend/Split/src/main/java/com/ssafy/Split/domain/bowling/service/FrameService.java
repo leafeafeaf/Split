@@ -67,8 +67,6 @@ public class FrameService {
     progress.updateFrameCount(currentFrameNum);
     progressRepository.save(progress);
 
-    log.info("Frame uploaded for device {}: {}", serial, frame);
-
     return currentFrameNum;
   }
 
@@ -88,7 +86,6 @@ public class FrameService {
 
     //해당 프레임의 비디오 URL이 이상하다.
     if (!(isValidVideoUrl(request.getVideo()))) {
-      log.info("#############{}", request.getVideo());
       throw new SplitException(ErrorCode.INVALID_VIDEO_URL);
     }
 
@@ -101,8 +98,6 @@ public class FrameService {
     frame.updateVideo(request.getVideo());
     frameRepository.save(frame);
 
-    log.info("Video URL updated for frame {} of device {}: {}", frameNum, serial,
-        request.getVideo());
   }
 
   private boolean isValidVideoUrl(String url) {

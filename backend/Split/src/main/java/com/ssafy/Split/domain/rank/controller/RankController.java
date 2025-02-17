@@ -34,6 +34,7 @@ public class RankController {
           .timestamp(LocalDateTime.now().toString())
           .build());
     }
+    log.info("랭킹 조회");
 
     return ResponseEntity.ok(RankingResponse.builder()
         .code("SUCCESS")

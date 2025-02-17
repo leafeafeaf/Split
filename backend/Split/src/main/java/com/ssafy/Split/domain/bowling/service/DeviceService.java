@@ -51,7 +51,6 @@ public class DeviceService {
         throw new SplitException(ErrorCode.DEVICE_IN_USE, String.valueOf(serial));
       } else {
         // 1시간이 지난 프로그레스인 경우 - 기존 데이터 삭제 후 새로운 게임 시작
-//        frameRepository.deleteAllByProgressId(existingProgress.getId());
         progressRepository.delete(existingProgress);
       }
     }
@@ -64,8 +63,6 @@ public class DeviceService {
         .time(LocalDateTime.now())
         .build();
 
-    log.info("Creating new progress: {}", progress);
-    Progress savedProgress = progressRepository.save(progress);
-    log.info("Saved progress: {}", savedProgress);
+    progressRepository.save(progress);
   }
 }

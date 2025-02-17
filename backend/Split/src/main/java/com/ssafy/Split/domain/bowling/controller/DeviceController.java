@@ -27,8 +27,8 @@ public class DeviceController {
   @PostMapping("/{serial}")
   public ResponseEntity<ApiResponse> startMeasurement(
       @PathVariable Integer serial) {
-    log.info("Starting measurement for device: {}", serial);
     deviceService.startMeasurement(serial);
+    log.info("디바이스 측정 시작 - serial : {}", serial);
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResponse.builder()

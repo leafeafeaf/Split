@@ -70,8 +70,6 @@ public class GameService {
     // 4. 사용자 정보 업데이트
     updateUserStats(user, game);
 
-    log.info("Game uploaded for user {}: {}", request.getUserId(), savedGame);
-
     return savedGame.getId();
   }
 
@@ -128,7 +126,6 @@ public class GameService {
   // BigDecimal 타입 평균 계산 (다른 BigDecimal 필드들용)
   private BigDecimal calculateNewAverage(BigDecimal currentAvg, BigDecimal newValue,
       int currentCount) {
-    log.info("currentcnt : {}", currentCount);
     return currentAvg.multiply(BigDecimal.valueOf(currentCount))
         .add(newValue)
         .divide(BigDecimal.valueOf(currentCount + 1), 2, RoundingMode.HALF_DOWN);

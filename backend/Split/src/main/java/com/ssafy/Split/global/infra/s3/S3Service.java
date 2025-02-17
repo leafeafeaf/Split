@@ -48,7 +48,6 @@ public class S3Service {
       }
       // S3에서 파일 삭제
       amazonS3.deleteObject(bucket, key);
-      log.info("File deleted successfully from S3: {}", key);
 
     } catch (AmazonS3Exception e) {
       log.error("Error deleting file from S3: {}", fileUrl, e);
@@ -98,7 +97,6 @@ public class S3Service {
     SetObjectTaggingRequest setTaggingRequest = new SetObjectTaggingRequest(bucket, s3Key,
         newTagging);
     amazonS3.setObjectTagging(setTaggingRequest);
-    log.info("태그 변경 완료: {} | 새 유효기간: {}", s3Key, newExpireTag);
   }
 
 }
