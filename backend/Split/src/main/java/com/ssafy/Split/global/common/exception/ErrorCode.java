@@ -56,6 +56,7 @@ public enum ErrorCode {
   //s3
   S3_DELETE_ERROR(500, "S001", "Error deleting file from S3"),
   INVALID_FILE_URL(400, "S002", "Invalid file URL format"),
+  S3_FILE_NOT_FOUND(404, "S003", "요청한 파일이 S3에 존재하지 않습니다."),
 
   //video
   VIDEO_ALREADY_EXISTS(400, "V001", "Video URL already exists");

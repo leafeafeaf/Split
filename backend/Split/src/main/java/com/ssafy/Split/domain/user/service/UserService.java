@@ -31,17 +31,16 @@ public class UserService {
         .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND));
 
     String highlightUrl = user.getHighlight();
-    if (highlightUrl != null && !highlightUrl.isEmpty()) {
-      // S3에서 파일 삭제
-      s3Service.deleteFile(highlightUrl);
-
-      // DB에서 하이라이트 URL 제거
-      user.updateHighlight(null);
-      userRepository.save(user);
-
-      log.info("Highlight deleted for user: {}", userId);
-
+    if (highlightUrl == null || highlightUrl.isEmpty()) {
+      throw new SplitException(ErrorCode.HIGHLIGHT_NOT_FOUND, highlightUrl);
     }
+    // S3에서 파일 삭제
+    s3Service.deleteFile(highlightUrl);
+
+    // DB에서 하이라이트 URL 제거
+    user.updateHighlight(null);
+    userRepository.save(user);
+
   }
 
   public void createHighlight(Integer userId, String highlight) {
@@ -60,8 +59,7 @@ public class UserService {
 
     user.createHighlight(highlight);
     userRepository.save(user);
-
-    log.info("Highlight created for user {}: {}", userId, highlight);
+    s3Service.updateObjectTag(highlight, "FOREVER");
 
 
   }
@@ -79,11 +77,14 @@ public class UserService {
     if (user.getHighlight() == null || user.getHighlight().isEmpty()) {
       throw new SplitException(ErrorCode.HIGHLIGHT_NOT_FOUND);
     }
+    String remainHighlight = user.getHighlight();
 
     user.updateHighlight(highlight);
     userRepository.save(user);
+    s3Service.updateObjectTag(remainHighlight, "1day");
 
-    log.info("Highlight updated for user {}: {}", userId, highlight);
+    s3Service.updateObjectTag(highlight, "FOREVER");
+
   }
 
   /**
@@ -95,7 +96,6 @@ public class UserService {
         .orElseThrow(() -> new SplitException(ErrorCode.USER_NOT_FOUND, String.valueOf(userId)));
 
     user.updateThema(thema);
-    log.info("User {} thema updated to {}", userId, thema);
   }
 
   private boolean isValidVideoUrl(String url) {

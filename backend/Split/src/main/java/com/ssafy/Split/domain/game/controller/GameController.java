@@ -41,6 +41,7 @@ public class GameController {
     int userId = userDetails.getUser().getId();
 
     Integer gameId = gameService.uploadGame(userId, request);
+    log.info("게임 등록 - userId : {}, gameId : {}", userId, gameId);
 
     return ResponseEntity.ok(GameUploadResponse.builder()
         .code("SUCCESS")
@@ -62,6 +63,7 @@ public class GameController {
     int userId = userDetails.getUser().getId();
 
     GameResponse.GameData gameData = gameService.getGame(userId, gameId);
+    log.info("게임 id로 게임 조회 - userId : {},  gameId : {}", userId, gameId);
 
     return ResponseEntity.ok(GameResponse.builder()
         .code("SUCCESS")
@@ -85,6 +87,7 @@ public class GameController {
     int userId = userDetails.getUser().getId();
 
     GameListResponse.GameListData listData = gameService.getGameList(userId, count);
+    log.info("유저를 통한 게임 조회 - userId : {},  count : {}", userId, count);
 
     return ResponseEntity.ok(GameListResponse.builder()
         .code("SUCCESS")

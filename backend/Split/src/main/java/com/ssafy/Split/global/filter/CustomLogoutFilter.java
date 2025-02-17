@@ -10,11 +10,13 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+@Slf4j
 @RequiredArgsConstructor
 public class CustomLogoutFilter extends GenericFilterBean {
     private final JWTService JWTService;
@@ -39,6 +41,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
         JWTService.logout(request,response);
 
+        log.info("로그아웃 실행");
         ApiResponse apiResponse = ApiResponse.builder()
                 .code("SUCCESS")
                 .status(200)

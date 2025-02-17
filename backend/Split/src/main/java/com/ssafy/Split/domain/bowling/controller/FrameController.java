@@ -56,6 +56,8 @@ public class FrameController {
         .speed(frame.getSpeed())
         .build();
 
+    log.info("프레임 조회 - serial : {}, frameNum : {}", serialNumber, frameNum);
+
     return ResponseEntity.ok(FrameResponse.builder()
         .code("SUCCESS")
         .status(200)
@@ -74,6 +76,8 @@ public class FrameController {
       @PathVariable Integer serialNumber
   ) {
     List<FrameData> frames = frameService.getAllFrames(serialNumber);
+
+    log.info("프레임 전체조회 - serial : {}", serialNumber);
 
     return ResponseEntity.ok(FrameListResponse.builder()
         .code("SUCCESS")
@@ -103,6 +107,8 @@ public class FrameController {
             .num(frameNum)
             .build())
         .build();
+
+    log.info("프레임 업로드 - serial : {}", serial);
     return ResponseEntity.ok(response);
   }
 
@@ -111,12 +117,13 @@ public class FrameController {
    * 프레임 비디오 업로드
    **/
   @PostMapping("/{serial}/frame/{frameNum}/video")
-  public ResponseEntity<?> uploadVideo(
+  public ResponseEntity<VideoUploadResponse> uploadVideo(
       @PathVariable Integer serial,
       @PathVariable Integer frameNum,
       @Valid @RequestBody VideoUploadRequest request) {
 
     frameService.uploadVideo(serial, frameNum, request);
+    log.info("프레임 비디오 업로드 - serial : {}", serial);
 
     return ResponseEntity.ok(VideoUploadResponse.builder()
         .code("SUCCESS")

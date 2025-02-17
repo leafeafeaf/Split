@@ -31,7 +31,7 @@ public class RankingResponse {
         private Integer totalGameCount;
         private String gameDate;
         private BigDecimal poseHighscore;
-        private BigDecimal poseLosescore;
+        private BigDecimal poseLowscore;
         private BigDecimal poseAvgscore;
         private BigDecimal elbowAngleScore;
         private BigDecimal armStabilityScore;
