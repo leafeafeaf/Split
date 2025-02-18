@@ -1,9 +1,0 @@
-{
-  "/login/page": "app/login/page.js",
-  "/page": "app/page.js",
-  "/check/page": "app/check/page.js",
-  "/check/measure/round/[id]/page": "app/check/measure/round/[id]/page.js",
-  "/home/page": "app/home/page.js",
-  "/check/measure/page": "app/check/measure/page.js",
-  "/check/measure/game/page": "app/check/measure/game/page.js"
-}
