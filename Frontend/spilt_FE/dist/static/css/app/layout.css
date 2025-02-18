@@ -830,6 +830,9 @@ video {
 .h-\[3px\] {
   height: 3px;
 }
+.h-\[500px\] {
+  height: 500px;
+}
 .h-\[calc\(100vh-100px\)\] {
   height: calc(100vh - 100px);
 }
@@ -961,6 +964,9 @@ video {
 }
 .w-\[3px\] {
   width: 3px;
+}
+.w-\[500px\] {
+  width: 500px;
 }
 .w-auto {
   width: auto;
@@ -1659,6 +1665,10 @@ video {
 }
 .text-6xl {
   font-size: 3.75rem;
+  line-height: 1;
+}
+.text-7xl {
+  font-size: 4.5rem;
   line-height: 1;
 }
 .text-\[0\.8rem\] {
