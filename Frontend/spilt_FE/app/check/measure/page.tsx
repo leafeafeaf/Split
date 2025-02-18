@@ -225,10 +225,6 @@ export default function MeasurePage() {
     }
   }, [frames])
 
-  const handleSegmentClick = (roundNumber: number) => {
-    router.push(`/check/measure/round/${roundNumber}`)
-  }
-
   const handleProgressButtonClick = async () => {
     const existingScore = typeof window !== 'undefined' ? sessionStorage.getItem("bowlingScore") : null
 
@@ -283,7 +279,7 @@ export default function MeasurePage() {
         <h1 className="text-3xl font-bold text-white text-center mb-8">진행 상황</h1>
 
         <div className="flex justify-center">
-          <ProgressGauge progress={progress} onSegmentClick={handleSegmentClick} />
+          <ProgressGauge progress={progress} />
         </div>
 
         <ProgressButton progress={progress} onClick={handleProgressButtonClick} disabled={isLoading} />
