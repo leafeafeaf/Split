@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import ThemeToggle from "@/components/ui/theme-toggle"
 import SmallBowlingBall from "@/components/small-bowling-ball"
@@ -13,7 +13,7 @@ import { clearFrames, setFrames } from "@/app/features/frameSlice"
 import { toast } from "sonner"
 import type { FrameData } from "@/types/frame"
 
-export default function GameEvaluationPage() {
+function GameContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const dispatch = useAppDispatch()
@@ -220,6 +220,21 @@ export default function GameEvaluationPage() {
     </div>
   )
 }
+
+export default function GameEvaluationPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen bg-[#161622] flex items-center justify-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-[#0066FF] border-r-transparent"></div>
+        </div>
+      }
+    >
+      <GameContent />
+    </Suspense>
+  )
+}
+
 
 
 
