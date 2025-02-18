@@ -1,0 +1,59 @@
+server:
+  port: 8080
+
+spring:
+  jwt:
+    access:
+      expire-time: 1800000
+    refresh:
+      expire-time: 86400000
+    secret: test_jwt_secret_key_for_local_testing
+
+  redis:
+    host: localhost
+    port: 6379
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/testsplit
+    username: root
+    password: nagm#1282
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: create  # 테스트 시에는 create-drop으로 설정
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    show-sql: true
+    defer-datasource-initialization: true
+
+  batch:
+    jdbc:
+      initialize-schema: always  # 테스트 시에는 always로 설정
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type: trace
+    com.your.package: debug
+    org.hibernate.tool.hbm2ddl: debug
+
+sql:
+  init:
+    mode: always
+
+# AWS 설정 - 테스트용 더미 값
+cloud:
+  aws:
+    s3:
+      region: ap-northeast-2
+      bucket: test-bucket
+    stack.auto: false
+    credentials:
+      accessKey: test_access_key
+      secretKey: test_secret_key
