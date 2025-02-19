@@ -25,6 +25,21 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/check/page.js"
+    ],
+    "/check/measure/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/check/measure/page.js"
+    ],
+    "/check/measure/game/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/check/measure/game/page.js"
+    ],
+    "/check/measure/round/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/check/measure/round/[id]/page.js"
     ]
   }
 }

@@ -269,20 +269,25 @@ export default function MeasurePage() {
   }, [currentSerial, router])
 
   return (
-    <div className="min-h-screen bg-[#161622] p-6 pb-24">
-      <div className="flex justify-between items-center mb-12">
+    <div className="min-h-screen bg-[#161622] p-3 pb-16">
+      <div className="flex justify-between items-center mb-4">
         <ThemeToggle />
         <UserMenu />
       </div>
 
-      <div className="max-w-md mx-auto space-y-12">
-        <h1 className="text-3xl font-bold text-white text-center mb-8">진행 상황</h1>
+      <div className="max-w-md mx-auto space-y-4">
+        <h1 className="text-2xl font-bold text-white text-center mb-2">진행 상황</h1>
 
         <div className="flex justify-center">
           <ProgressGauge progress={progress} />
         </div>
 
-        <ProgressButton progress={progress} onClick={handleProgressButtonClick} disabled={isLoading} />
+        <ProgressButton 
+          progress={progress} 
+          onClick={handleProgressButtonClick} 
+          disabled={isLoading}
+          className="mt-2"
+        />
       </div>
 
       <NavigationBar />

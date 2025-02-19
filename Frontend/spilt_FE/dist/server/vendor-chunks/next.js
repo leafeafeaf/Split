@@ -10,6 +10,16 @@ exports.id = "vendor-chunks/next";
 exports.ids = ["vendor-chunks/next"];
 exports.modules = {
 
+/***/ "(rsc)/./node_modules/next/font/local/target.css?{\"path\":\"app\\\\layout.tsx\",\"import\":\"\",\"arguments\":[{\"src\":\"../public/fonts/Moneygraphy-Rounded.ttf\",\"variable\":\"--font-moneygraphy\"}],\"variableName\":\"moneygraphy\"}":
+/*!*********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/next/font/local/target.css?{"path":"app\\layout.tsx","import":"","arguments":[{"src":"../public/fonts/Moneygraphy-Rounded.ttf","variable":"--font-moneygraphy"}],"variableName":"moneygraphy"} ***!
+  \*********************************************************************************************************************************************************************************************************************/
+/***/ ((module) => {
+
+eval("// Exports\nmodule.exports = {\n\t\"style\": {\"fontFamily\":\"'__moneygraphy_59d94a', '__moneygraphy_Fallback_59d94a'\"},\n\t\"className\": \"__className_59d94a\",\n\t\"variable\": \"__variable_59d94a\"\n};\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbmV4dC9mb250L2xvY2FsL3RhcmdldC5jc3M/e1wicGF0aFwiOlwiYXBwXFxcXGxheW91dC50c3hcIixcImltcG9ydFwiOlwiXCIsXCJhcmd1bWVudHNcIjpbe1wic3JjXCI6XCIuLi9wdWJsaWMvZm9udHMvTW9uZXlncmFwaHktUm91bmRlZC50dGZcIixcInZhcmlhYmxlXCI6XCItLWZvbnQtbW9uZXlncmFwaHlcIn1dLFwidmFyaWFibGVOYW1lXCI6XCJtb25leWdyYXBoeVwifSIsIm1hcHBpbmdzIjoiQUFBQTtBQUNBO0FBQ0EsV0FBVyx1RUFBdUU7QUFDbEY7QUFDQTtBQUNBIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbXktdjAtcHJvamVjdC8uL25vZGVfbW9kdWxlcy9uZXh0L2ZvbnQvbG9jYWwvdGFyZ2V0LmNzcz9kYmE2Il0sInNvdXJjZXNDb250ZW50IjpbIi8vIEV4cG9ydHNcbm1vZHVsZS5leHBvcnRzID0ge1xuXHRcInN0eWxlXCI6IHtcImZvbnRGYW1pbHlcIjpcIidfX21vbmV5Z3JhcGh5XzU5ZDk0YScsICdfX21vbmV5Z3JhcGh5X0ZhbGxiYWNrXzU5ZDk0YSdcIn0sXG5cdFwiY2xhc3NOYW1lXCI6IFwiX19jbGFzc05hbWVfNTlkOTRhXCIsXG5cdFwidmFyaWFibGVcIjogXCJfX3ZhcmlhYmxlXzU5ZDk0YVwiXG59O1xuIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/next/font/local/target.css?{\"path\":\"app\\\\layout.tsx\",\"import\":\"\",\"arguments\":[{\"src\":\"../public/fonts/Moneygraphy-Rounded.ttf\",\"variable\":\"--font-moneygraphy\"}],\"variableName\":\"moneygraphy\"}\n");
+
+/***/ }),
+
 /***/ "(ssr)/./node_modules/next/dist/api/link.js":
 /*!********************************************!*\
   !*** ./node_modules/next/dist/api/link.js ***!

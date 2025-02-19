@@ -1,3 +1,15 @@
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[3].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[3].use[2]!./node_modules/next/font/local/target.css?{"path":"app\\layout.tsx","import":"","arguments":[{"src":"../public/fonts/Moneygraphy-Rounded.ttf","variable":"--font-moneygraphy"}],"variableName":"moneygraphy"} ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+@font-face {
+font-family: '__moneygraphy_59d94a';
+src: url(/_next/static/media/cbb6d492d7707051-s.p.ttf) format('truetype');
+font-display: swap;
+}@font-face {font-family: '__moneygraphy_Fallback_59d94a';src: local("Arial");ascent-override: 73.30%;descent-override: 26.24%;line-gap-override: 0.00%;size-adjust: 110.51%
+}.__className_59d94a {font-family: '__moneygraphy_59d94a', '__moneygraphy_Fallback_59d94a'
+}.__variable_59d94a {--font-moneygraphy: '__moneygraphy_59d94a', '__moneygraphy_Fallback_59d94a'
+}
+
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./app/globals.css ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
@@ -144,7 +156,7 @@ html,
   -webkit-text-size-adjust: 100%; /* 2 */
   -moz-tab-size: 4; /* 3 */
   tab-size: 4; /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* 4 */
+  font-family: var(--font-moneygraphy), sans-serif; /* 4 */
   font-feature-settings: normal; /* 5 */
   font-variation-settings: normal; /* 6 */
   -webkit-tap-highlight-color: transparent; /* 7 */
@@ -1630,6 +1642,9 @@ video {
 .pb-2 {
   padding-bottom: 0.5rem;
 }
+.pb-20 {
+  padding-bottom: 5rem;
+}
 .pb-24 {
   padding-bottom: 6rem;
 }
@@ -1641,6 +1656,9 @@ video {
 }
 .pl-10 {
   padding-left: 2.5rem;
+}
+.pl-2 {
+  padding-left: 0.5rem;
 }
 .pl-2\.5 {
   padding-left: 0.625rem;
@@ -1678,6 +1696,9 @@ video {
 .pt-8 {
   padding-top: 2rem;
 }
+.pb-16 {
+  padding-bottom: 4rem;
+}
 .text-left {
   text-align: left;
 }
@@ -1701,10 +1722,6 @@ video {
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
-}
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
 }
 .text-6xl {
   font-size: 3.75rem;
@@ -3063,6 +3080,10 @@ video {
 
   .sm\:rounded-lg {
     border-radius: var(--radius);
+  }
+
+  .sm\:p-6 {
+    padding: 1.5rem;
   }
 
   .sm\:text-left {

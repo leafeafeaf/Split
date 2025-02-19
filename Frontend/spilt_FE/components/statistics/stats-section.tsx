@@ -11,10 +11,10 @@ interface StatItemProps {
 function StatItem({ label, value, color }: StatItemProps) {
   return (
     <div className="flex flex-col items-center">
-      <span className="text-2xl font-medium mb-2" style={{ color }}>
+      <span className="text-1xl font-medium mb-2" style={{ color }}>
         {label}
       </span>
-      <span className="text-4xl font-bold text-white">{value}</span>
+      <span className="text-3xl font-bold text-white">{value}</span>
     </div>
   )
 }
