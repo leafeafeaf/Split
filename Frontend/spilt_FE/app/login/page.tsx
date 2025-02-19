@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -47,7 +47,8 @@ export default function LoginPage() {
           }),
         )
 
-        router.push("/home")
+        // 변경된 부분: /home 대신 / 경로로 이동
+        router.push("/")
       }
     } catch (error: any) {
       if (error.response?.status === 401) {
