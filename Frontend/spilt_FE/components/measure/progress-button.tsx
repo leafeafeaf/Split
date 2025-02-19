@@ -47,17 +47,16 @@ interface ProgressButtonProps {
   progress: number
   onClick: () => void
   disabled?: boolean
+  className?: string
 }
 
-export function ProgressButton({ progress, onClick, disabled = false }: ProgressButtonProps) {
+export function ProgressButton({ progress, onClick, disabled = false, className = "" }: ProgressButtonProps) {
   const isComplete = progress === 100
 
   return (
-    <div className="relative w-full h-14 rounded-2xl overflow-hidden">
-      {/* 배경 */}
+    <div className={`relative w-full h-14 rounded-2xl overflow-hidden ${className}`}>
       <div className="absolute inset-0 bg-[#2E2E3D]" />
 
-      {/* 진행 상태 채우기 */}
       <motion.div
         className="absolute inset-0 bg-[#0066FF]"
         initial={{ width: 0 }}
@@ -65,7 +64,6 @@ export function ProgressButton({ progress, onClick, disabled = false }: Progress
         transition={{ duration: 0.3 }}
       />
 
-      {/* 버튼 */}
       <button
         onClick={onClick}
         disabled={disabled}

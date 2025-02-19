@@ -80,7 +80,7 @@ export function ScoreChart() {
     <div className="space-y-4">
       <h2 className="text-2xl text-white text-center font-medium">Score Statistics</h2>
 
-      <Card className="p-6 bg-[#1E1E2D] relative h-[300px]">
+      <Card className="py-6 pr-8 pl-2 bg-[#1E1E2D] relative h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={visibleData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
             <CartesianGrid stroke="rgba(255,255,255,0.1)" vertical={false} />

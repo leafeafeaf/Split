@@ -20,10 +20,10 @@ export function BowlingStats({ stats }: BowlingStatsProps) {
         <div className="grid grid-cols-2 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="flex flex-col items-center">
-              <span className="text-2xl font-medium mb-2" style={{ color: stat.color }}>
+              <span className="text-1xl font-medium mb-2" style={{ color: stat.color }}>
                 {stat.label}
               </span>
-              <span className="text-5xl font-bold text-white">{stat.value}</span>
+              <span className="text-3xl font-bold text-white">{stat.value}</span>
             </div>
           ))}
         </div>

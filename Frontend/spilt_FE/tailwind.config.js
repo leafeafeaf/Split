@@ -10,6 +10,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-moneygraphy)', 'sans-serif'],
+        moneygraphy: ['var(--font-moneygraphy)', 'sans-serif'],
+      },
       colors: {
         bowling: {
           cyan: "#00FFE5",
