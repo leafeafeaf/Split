@@ -35243,37 +35243,19 @@ VALUES
 (30102, 3512, '2024-07-25 00:00:00', False, 74.18, 49.47, 61.83, 63.4, 68.34, 37.06, 197);
 
 
-INSERT INTO game_rank (
-    game_id,
-    user_id,
-    nickname,
-    total_game_count,
-    game_date,
-    pose_highscore,
-    pose_lowscore,
-    pose_avgscore,
-    elbow_angle_score,
-    arm_stability_score,
-    arm_speed
-)
-SELECT
-    g.id,
-    g.user_id,
-    u.nickname,
-    u.total_game_count,
-    g.game_date,
-    g.pose_highscore,
-    g.pose_lowscore,
-    g.pose_avgscore,
-    g.elbow_angle_score,
-    g.arm_stability_score,
-    g.arm_speed
+INSERT INTO game_rank (game_id, user_id, nickname, total_game_count, game_date,
+                           pose_highscore, pose_lowscore, pose_avgscore,
+                           elbow_angle_score, arm_stability_score, arm_speed, highlight)
+SELECT g.id, g.user_id, u.nickname, u.total_game_count, g.game_date,
+       g.pose_highscore, g.pose_lowscore, g.pose_avgscore,
+       g.elbow_angle_score, g.arm_stability_score, g.arm_speed,
+       u.highlight
 FROM game g
 JOIN user u ON g.user_id = u.id
 WHERE g.user_id IN (
     SELECT g2.user_id
     FROM game g2
-    WHERE g2.game_date >= DATE_SUB(CURRENT_DATE, INTERVAL 1 YEAR)
+    WHERE g2.game_date >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
     AND g2.is_skip = false
     GROUP BY g2.user_id
     HAVING COUNT(g2.user_id) >= 5
