@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Mail, Lock, Eye, EyeOff, User, Check, X } from "lucide-react"
+import { Mail, Lock, Eye, EyeOff, User, Check, X } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -17,9 +17,18 @@ const GENDER_MAP = {
   male: 1,
   female: 2,
   unspecified: 3,
-}
+} as const
 
 type GenderKey = keyof typeof GENDER_MAP
+
+interface FormData {
+  email: string
+  password: string
+  confirmPassword: string
+  gender: GenderKey | ""
+  height: string
+  nickname: string
+}
 
 interface NicknameValidation {
   isChecking: boolean
@@ -37,11 +46,11 @@ export default function SignUpPage() {
     isValid: null,
     message: "",
   })
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
     confirmPassword: "",
-    gender: "" as GenderKey,
+    gender: "",
     height: "170",
     nickname: "",
   })
@@ -80,7 +89,7 @@ export default function SignUpPage() {
         })
       }
     }
-  }, 500) // 500ms debounce
+  }, 500)
 
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value
@@ -108,7 +117,7 @@ export default function SignUpPage() {
       formDataToSend.append("email", formData.email)
       formDataToSend.append("password", formData.password)
       formDataToSend.append("nickname", formData.nickname)
-      formDataToSend.append("gender", GENDER_MAP[formData.gender].toString())
+      formDataToSend.append("gender", formData.gender ? GENDER_MAP[formData.gender].toString() : "")
       formDataToSend.append("height", formData.height)
 
       const response = await api.post("user", formDataToSend, {
@@ -224,12 +233,15 @@ export default function SignUpPage() {
             <Select
               value={formData.gender}
               onValueChange={(value: GenderKey) => setFormData({ ...formData, gender: value })}
-              disabled={isLoading}
             >
               <SelectTrigger className="bg-transparent border-[#A2A2A7] text-white">
                 <SelectValue placeholder="Select your gender" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent
+                className="bg-[#1E1E2D] border-[#2E2E3D] text-white"
+                position="popper"
+                sideOffset={5}
+              >
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="unspecified">Prefer not to say</SelectItem>
@@ -242,12 +254,15 @@ export default function SignUpPage() {
             <Select
               value={formData.height}
               onValueChange={(value) => setFormData({ ...formData, height: value })}
-              disabled={isLoading}
             >
               <SelectTrigger className="bg-transparent border-[#A2A2A7] text-white">
                 <SelectValue placeholder="Select your height" />
               </SelectTrigger>
-              <SelectContent className="max-h-[200px] overflow-y-auto">
+              <SelectContent
+                className="bg-[#1E1E2D] border-[#2E2E3D] text-white max-h-[200px] overflow-y-auto"
+                position="popper"
+                sideOffset={5}
+              >
                 {heightOptions.map((height) => (
                   <SelectItem key={height} value={height}>
                     {height} cm
@@ -272,8 +287,8 @@ export default function SignUpPage() {
                   nicknameValidation.isValid === true
                     ? "border-green-500"
                     : nicknameValidation.isValid === false
-                      ? "border-red-500"
-                      : ""
+                    ? "border-red-500"
+                    : ""
                 }`}
                 placeholder="Enter your nickname"
                 required
