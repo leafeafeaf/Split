@@ -1,2 +1,53 @@
 server:
   port: 8080
+
+spring:
+  jwt:
+    access:
+      expire-time: 1800000
+    refresh:
+      expire-time: 86400000
+    secret: ${SPRING_JWT_SECRET}
+  redis:
+    host: ${SPRING_REDIS_HOST}
+    port: ${SPRING_REDIS_PORT}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+        show_sql: false
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    generate-ddl: true
+    show-sql: false
+    defer-datasource-initialization: true # 하이버네이트가 테이블 만들고 data.sql실행보장.
+  batch:
+    jdbc:
+      initialize-schema: never
+
+  logging:
+    level:
+      org.hibernate.SQL: debug  # SQL 쿼리 로그 출력
+      org.hibernate.type: trace # SQL 쿼리 파라미터 로그 출력
+      com.your.package: debug
+      org.hibernate.tool.hbm2ddl: debug  # 스키마 생성 관련 로그
+  sql:
+    init:
+      mode: always
+  # AWS 설정
+cloud:
+  aws:
+    s3:
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_BUCKET_NAME}
+    stack.auto: false
+    credentials:
+      accessKey: ${AWS_S3_ACCESS_KEY}
+      secretKey: ${AWS_S3_SECRET_KEY}
