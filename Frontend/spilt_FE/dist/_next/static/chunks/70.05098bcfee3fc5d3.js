@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[70],{66070:function(n,e,c){c.r(e),c.d(e,{Card:function(){return u}});var r=c(57437);function u(n){let{children:e,className:c=""}=n;return(0,r.jsx)("div",{className:"bg-[#1E1E2D] rounded-lg p-4 ".concat(c),children:e})}}}]);
