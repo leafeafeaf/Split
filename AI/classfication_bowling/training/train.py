@@ -70,5 +70,5 @@ def epoch_not_finished():
 def save_model():
     from training.visualization import net
     torch.save(net.state_dict(), 'model.pth')
-    # net.load_state_dict(torch.load('model.pth'))
+    
 

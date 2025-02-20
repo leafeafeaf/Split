@@ -22,12 +22,5 @@ def labeling(video_name,video_skel):
             dataset.append({'key': label, 'value': video_skel[-length:]})
             print(f"마지막 seq list 크기 : {len(seq_list)}")
 
-            # if len(skel_dataset) % (length // 4) != 0:
-            #     last_seq = skel_dataset[-length:]
-            #     dataset.append({'key': label, 'value': last_seq})
-
-
-        # for i, sample in enumerate(dataset[:5]):  # 5개만 체크
-        #     print(f"Sample {i}: key={sample['key']}, value_shape={np.array(sample['value']).shape}")
         print(f"dataset 크기 : {len(dataset)}")
         save_to_json(dataset)

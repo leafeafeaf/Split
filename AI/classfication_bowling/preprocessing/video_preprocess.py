@@ -23,8 +23,7 @@ def process_videos(input_folder, output_folder, fps=30):
 
     video_files = [f for f in os.listdir(input_folder) if f.endswith('.mp4')]
     video_files.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-    skel_dataset = []
-    video_idx = 64
+    video_idx = 119
 
     for video_file in video_files:
         print(video_file)
@@ -40,7 +39,7 @@ def process_videos(input_folder, output_folder, fps=30):
         frames = []
 
 
-        #---------------유사도 판단 데이터 저장장-------------
+        #---------------유사도 판단 데이터 저장-------------
         # 'similar' 폴더 안에 'image_data' 폴더 경로 설정
         output_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'similarity_measure','image_data',f"image_data_{video_idx}")
         output_folder = os.path.abspath(output_folder)
@@ -168,12 +167,12 @@ def process_videos(input_folder, output_folder, fps=30):
 
         # 스켈레톤 데이터 저장 ----- 유사도 판단단
         save_skel_to_json(skel_output,skel_output_folder,video_idx)
-        # video_idx +=1
+        video_idx +=1
 
     skel_filename = os.path.join(skel_output_folder, f'skel_data_{video_idx:03d}.json')
 
 
-    train(output_folder,skel_filename)
+    # train(output_folder,skel_filename)
         
         # labeling(video_file,skel_per_video)
 
@@ -181,9 +180,21 @@ def process_videos(input_folder, output_folder, fps=30):
 
     # return skel_dataset
 
-        # 결과를 MP4로 저장
-        # to_mp4(output_images, fps=fps, input_file_path=video_path, output_folder=output_folder)
 
+
+def interpolate_keypoints_between_frames(prev_keypoints, next_keypoints, gap, num_keypoints=17):
+    """두 프레임 사이의 키포인트를 비례적으로 보간합니다."""
+    keypoints_interpolated = []
+    
+    for i in range(num_keypoints):
+        prev_keypoint = prev_keypoints[i]
+        next_keypoint = next_keypoints[i]
+        
+        # X, Y 좌표와 스코어를 비례적으로 보간
+        interpolated_keypoint = prev_keypoint + (next_keypoint - prev_keypoint) * np.linspace(0, 1, gap)
+        keypoints_interpolated.append(interpolated_keypoint)
+        
+    return np.array(keypoints_interpolated)
 
 def process_video_infer(video_path, output_folder, fps=30):
     # ✅ output_folder 매개변수 추가
@@ -196,8 +207,6 @@ def process_video_infer(video_path, output_folder, fps=30):
     print(f"Original FPS: {original_fps}")
 
     # 프레임을 저장할 리스트 초기화
-    
-    
     frames = []
     frames_128 = []
 
@@ -207,8 +216,8 @@ def process_video_infer(video_path, output_folder, fps=30):
         if not ret:
             break
 
-
         frame_128 = cv2.resize(frame, (128, 128))  # 프레임 크기 조정
+        frame = cv2.resize(frame, (640, 640))  # 프레임 크기 조정
 
         # BGR -> RGB 변환 (OpenCV는 기본적으로 BGR로 이미지를 읽음)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -222,7 +231,6 @@ def process_video_infer(video_path, output_folder, fps=30):
 
     # NumPy 배열로 변환
     frames_np = np.array(frames)
-    frames_128_np = np.array(frames_128)
 
     # ✅ 프레임이 비어있는 경우 예외 처리 추가
     if frames_np.size == 0:
@@ -231,39 +239,31 @@ def process_video_infer(video_path, output_folder, fps=30):
 
     # TensorFlow 텐서로 변환
     image = tf.convert_to_tensor(frames_np, dtype=tf.uint8)
-    # image_128 = tf.convert_to_tensor(frames_128_np, dtype=tf.uint8)
 
     # 텐서 모양 확인
     num_frames, image_height, image_width, channels = image.shape
-    # num_frames_128, image_height_128, image_width_128, channels_128 = image_128.shape
     print(f"Processing video: {video_path}")
     print(f"Number of frames: {num_frames}, Image height: {image_height}, Image width: {image_width}, Channels: {channels}")
 
     # Crop 영역 설정
     crop_region = init_crop_region(image_height, image_width)
-    # crop_region_128 = init_crop_region(image_height_128, image_width_128)
 
     output_images = []
-
     skel_datasetof2 = []
     skel_dataset = []
-    
+
+    # 키포인트가 17개인 프레임 찾기
+    keypoints_with_scores_per_frame = []
 
     for frame_idx in range(num_frames):
-        keypoint_datasetof2 = [] # 영상 저장
-        keypoint_dataset = [] # 유사도 저장장
+        keypoint_datasetof2 = []
+        keypoint_dataset = []
 
         # 키포인트 추론 수행
         keypoints_with_scores = run_inference(
             movenet, image[frame_idx, :, :, :], crop_region,
             crop_size=[input_size, input_size]
         )
-        # # 키포인트 추론 수행
-        # keypoints_with_scores_128 = run_inference(
-        #     movenet, image_128[frame_idx, :, :, :], crop_region_128,
-        #     crop_size=[input_size, input_size]
-        # )
-
 
         # 키포인트 시각화 및 데이터 추출
         keypoint_xy, output_image, keypoint_scores = draw_prediction_on_image(
@@ -272,23 +272,29 @@ def process_video_infer(video_path, output_folder, fps=30):
             close_figure=True, output_image_height=300
         )
 
-        # # 키포인트 시각화 및 데이터 추출
-        # keypoint_xy_128, output_image_128, keypoint_scores_128 = draw_prediction_on_image(
-        #     image_128[frame_idx, :, :, :].numpy().astype(np.int32),
-        #     keypoints_with_scores_128, crop_region=None,
-        #     close_figure=True, output_image_height=300
-        # )
-
         # 키포인트 데이터 저장
-        if keypoint_xy is not None and keypoint_xy.shape[0] == 17: 
+        if keypoint_xy is not None and keypoint_xy.shape[0] == 17:
+            print(f"frame_idx = {frame_idx}")
             for keypoint_dict_idx in range(len(keypoint_xy)):
-                for keypoint_xy_idx in range(len(keypoint_xy[0])):
-                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-                    keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][keypoint_xy_idx])
-                keypoint_dataset.append(keypoint_scores[keypoint_dict_idx])
+                if keypoint_xy.ndim > 1:  # keypoint_xy가 2D 배열일 때
+                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][0])  # X 좌표
+                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][1])  # Y 좌표
+                else:  # keypoint_xy가 1D 배열일 경우
+                    keypoint_dataset.append(keypoint_xy[keypoint_dict_idx])  # 단일 좌표
 
-            skel_dataset.append(keypoint_dataset) # keypoint_dataset : [51개]
+                keypoint_dataset.append(keypoint_scores[keypoint_dict_idx])  # 스코어 추가
+
+                if keypoint_xy.ndim > 1:
+                    keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][0])
+                    keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][1])
+                else:
+                    keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx])
+
+            skel_dataset.append(keypoint_dataset)  # keypoint_dataset : [51개]
             skel_datasetof2.append(keypoint_datasetof2)
+        else:
+            print(f"frame_idx = {frame_idx}에서 키포인트 데이터가 유효하지 않습니다.")
+
         output_images.append(output_image)
 
         # 새로운 crop_region 업데이트
@@ -296,8 +302,42 @@ def process_video_infer(video_path, output_folder, fps=30):
             keypoints_with_scores, image_height, image_width
         )
 
-    # skel_dataset : [[51], [51], ... 프레임 개수만큼 ]
-    return skel_dataset,skel_datasetof2, output_images ,num_frames
+    # 보간 처리: 두 17개 키포인트가 있는 프레임 사이의 프레임을 보간
+    interpolated_keypoints = []
+    for i in range(1, len(keypoints_with_scores_per_frame)):
+        prev_keypoints, prev_scores = keypoints_with_scores_per_frame[i - 1]
+        next_keypoints, next_scores = keypoints_with_scores_per_frame[i]
+
+        if prev_keypoints is not None and next_keypoints is not None:
+            # 두 17개 키포인트가 있는 프레임 사이의 간격 계산
+            gap = i - (i - 1)  # 두 프레임 사이의 간격
+            interpolated = interpolate_keypoints_between_frames(prev_keypoints, next_keypoints, gap)
+            interpolated_keypoints.append(interpolated)
+
+    # 최종 키포인트 데이터 처리
+    for keypoint_xy, keypoint_scores in keypoints_with_scores_per_frame:
+        if keypoint_xy is None:  # 보간된 키포인트가 있을 경우
+            if interpolated_keypoints:  # 보간된 키포인트가 남아 있다면
+                interpolated_data = interpolated_keypoints.pop(0)
+                keypoint_xy = interpolated_data[0]  # 첫 번째 값은 keypoint_xy
+                keypoint_scores = interpolated_data[1]  # 두 번째 값은 keypoint_scores
+        else:
+            keypoint_xy, keypoint_scores = None, None
+
+        if keypoint_xy is not None:
+            for keypoint_dict_idx in range(len(keypoint_xy)):
+                keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][0])
+                keypoint_dataset.append(keypoint_xy[keypoint_dict_idx][1])
+                keypoint_dataset.append(keypoint_scores[keypoint_dict_idx])
+
+                keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][0])
+                keypoint_datasetof2.append(keypoint_xy[keypoint_dict_idx][1])
+
+            skel_dataset.append(keypoint_dataset)
+            skel_datasetof2.append(keypoint_datasetof2)
+
+    return skel_dataset, skel_datasetof2, output_images, num_frames
+
 
 def release_capture(input_folder, output_folder, fps=30):
     if not os.path.exists(output_folder):

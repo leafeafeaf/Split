@@ -61,11 +61,6 @@ def angle_extract():
             foot_angle.append(third)
         idx += 1
 
-    # arm_angle_avg = np.average(arm_angle)
-    # pelvis_angle_avg = np.average(pelvis_angle)
-    # foot_angle_avg = np.average(foot_angle)
-
-
     # CSV 저장
     csv_file = "angles_data.csv"
     with open(csv_file, 'w', newline='') as f:

@@ -107,64 +107,6 @@ def _keypoints_and_edges_for_display(
     return keypoints_xy, keypoints_scores, edges_xy, edge_colors  # 수정된 반환값
 
 
-# def _keypoints_and_edges_for_display(keypoints_with_scores,
-#                                      height,
-#                                      width,
-#                                      keypoint_threshold=0.11):
-#   """Returns high confidence keypoints and edges for visualization.
-
-#   Args:
-#     keypoints_with_scores: A numpy array with shape [1, 1, 17, 3] representing
-#       the keypoint coordinates and scores returned from the MoveNet model.
-#     height: height of the image in pixels.
-#     width: width of the image in pixels.
-#     keypoint_threshold: minimum confidence score for a keypoint to be
-#       visualized.
-
-#   Returns:
-#     A (keypoints_xy, edges_xy, edge_colors) containing:
-#       * the coordinates of all keypoints of all detected entities;
-#       * the coordinates of all skeleton edges of all detected entities;
-#       * the colors in which the edges should be plotted.
-#   """
-#   keypoints_all = []
-#   keypoint_edges_all = []
-#   edge_colors = []
-#   num_instances, _, _, _ = keypoints_with_scores.shape
-#   for idx in range(num_instances):
-#     kpts_x = keypoints_with_scores[0, idx, :, 0]
-#     kpts_y = keypoints_with_scores[0, idx, :, 1]
-#     kpts_scores = keypoints_with_scores[0, idx, :, 2]
-#     kpts_absolute_xy = np.stack(
-#         [width * np.array(kpts_x), height * np.array(kpts_y)], axis=-1)
-#     kpts_above_thresh_absolute = kpts_absolute_xy[
-#         kpts_scores > keypoint_threshold, :]
-#     keypoints_all.append(kpts_above_thresh_absolute)
-
-#     for edge_pair, color in KEYPOINT_EDGE_INDS_TO_COLOR.items():
-#       if (kpts_scores[edge_pair[0]] > keypoint_threshold and
-#           kpts_scores[edge_pair[1]] > keypoint_threshold):
-#         x_start = kpts_absolute_xy[edge_pair[0], 0]
-#         y_start = kpts_absolute_xy[edge_pair[0], 1]
-#         x_end = kpts_absolute_xy[edge_pair[1], 0]
-#         y_end = kpts_absolute_xy[edge_pair[1], 1]
-#         line_seg = np.array([[x_start, y_start], [x_end, y_end]])
-#         keypoint_edges_all.append(line_seg)
-#         edge_colors.append(color)
-#   if keypoints_all:
-#     keypoints_xy = np.concatenate(keypoints_all, axis=0)
-#   else:
-#     keypoints_xy = np.zeros((0, 17, 2))
-
-#   if keypoint_edges_all:
-#     edges_xy = np.stack(keypoint_edges_all, axis=0)
-#   else:
-#     edges_xy = np.zeros((0, 2, 2))
-
-#   # print(keypoints_xy)
-#   return keypoints_xy, edges_xy, edge_colors
-
-
 def draw_prediction_on_image(
     image, keypoints_with_scores, crop_region=None, close_figure=False,
     output_image_height=None):
@@ -205,10 +147,7 @@ def draw_prediction_on_image(
   (keypoint_locs,keypoint_scores, keypoint_edges,
    edge_colors) = _keypoints_and_edges_for_display(
        keypoints_with_scores, height, width)
-  # (keypoint_locs, keypoint_edges,
-  #  edge_colors) = _keypoints_and_edges_for_display(
-  #      keypoints_with_scores, height, width)
-
+  
   line_segments.set_segments(keypoint_edges)
   line_segments.set_color(edge_colors)
   if keypoint_edges.shape[0]:
@@ -271,51 +210,6 @@ def to_mp4(images, fps, input_file_path, output_folder):
     video_writer.release()
     print(f"Video saved as {output_file}")
 
-
-# if "tflite" in model_name:
-#   if "movenet_lightning_f16" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/float16/4?lite-format=tflite
-#     input_size = 192
-#   elif "movenet_thunder_f16" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/thunder/tflite/float16/4?lite-format=tflite
-#     input_size = 256
-#   elif "movenet_lightning_int8" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/lightning/tflite/int8/4?lite-format=tflite
-#     input_size = 192
-#   elif "movenet_thunder_int8" in model_name:
-#     !wget -q -O model.tflite https://tfhub.dev/google/lite-model/movenet/singlepose/thunder/tflite/int8/4?lite-format=tflite
-#     input_size = 256
-#   else:
-#     raise ValueError("Unsupported model name: %s" % model_name)
-
-#   # Initialize the TFLite interpreter
-#   interpreter = tf.lite.Interpreter(model_path="model.tflite")
-#   interpreter.allocate_tensors()
-
-#   def movenet(input_image):
-#     """Runs detection on an input image.
-
-#     Args:
-#       input_image: A [1, height, width, 3] tensor represents the input image
-#         pixels. Note that the height/width should already be resized and match the
-#         expected input resolution of the model before passing into this function.
-
-#     Returns:
-#       A [1, 1, 17, 3] float numpy array representing the predicted keypoint
-#       coordinates and scores.
-#     """
-#     # TF Lite format expects tensor type of uint8.
-#     input_image = tf.cast(input_image, dtype=tf.uint8)
-#     input_details = interpreter.get_input_details()
-#     output_details = interpreter.get_output_details()
-#     interpreter.set_tensor(input_details[0]['index'], input_image.numpy())
-#     # Invoke inference.
-#     interpreter.invoke()
-#     # Get the model prediction.
-#     keypoints_with_scores = interpreter.get_tensor(output_details[0]['index'])
-#     return keypoints_with_scores
-
-# else:
 
 model_name = "movenet_lightning"
 if "movenet_lightning" in model_name:
@@ -418,8 +312,8 @@ def determine_torso_and_body_range(
   for joint in KEYPOINT_DICT.keys():
     if keypoints[0, 0, KEYPOINT_DICT[joint], 2] < MIN_CROP_KEYPOINT_SCORE:
       continue
-    dist_y = abs(center_y - target_keypoints[joint][0]);
-    dist_x = abs(center_x - target_keypoints[joint][1]);
+    dist_y = abs(center_y - target_keypoints[joint][0])
+    dist_x = abs(center_x - target_keypoints[joint][1])
     if dist_y > max_body_yrange:
       max_body_yrange = dist_y
 
@@ -449,9 +343,9 @@ def determine_crop_region(
 
   if torso_visible(keypoints):
     center_y = (target_keypoints['left_hip'][0] +
-                target_keypoints['right_hip'][0]) / 2;
+                target_keypoints['right_hip'][0]) / 2
     center_x = (target_keypoints['left_hip'][1] +
-                target_keypoints['right_hip'][1]) / 2;
+                target_keypoints['right_hip'][1]) / 2
 
     (max_torso_yrange, max_torso_xrange,
       max_body_yrange, max_body_xrange) = determine_torso_and_body_range(
@@ -464,14 +358,14 @@ def determine_crop_region(
     tmp = np.array(
         [center_x, image_width - center_x, center_y, image_height - center_y])
     crop_length_half = np.amin(
-        [crop_length_half, np.amax(tmp)]);
+        [crop_length_half, np.amax(tmp)])
 
     crop_corner = [center_y - crop_length_half, center_x - crop_length_half];
 
     if crop_length_half > max(image_width, image_height) / 2:
       return init_crop_region(image_height, image_width)
     else:
-      crop_length = crop_length_half * 2;
+      crop_length = crop_length_half * 2
       return {
         'y_min': crop_corner[0] / image_height,
         'x_min': crop_corner[1] / image_width,

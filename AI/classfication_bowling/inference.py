@@ -77,11 +77,12 @@ def calculate_similarity(pred_kp, actual_kp):
     """
     mse = np.mean(np.square(pred_kp - actual_kp), axis=1)  # MSE 계산
     print(f"mse: {mse}")
-    similarity_scores = 1 / (1 + mse)  # 값이 작을수록 유사도 높음
+    similarity_scores = 1 / (1 + np.sqrt(mse))*100  # 값이 작을수록 유사도 높음
 
-    showing_scores = 1000 * (1 - np.log1p(mse) / np.log1p(5000))
+    # showing_scores = 1000 * (1 - np.log1p(mse) / np.log1p(5000))
 
-    return similarity_scores,showing_scores  # shape: (batch_size,)
+    # return similarity_scores,showing_scores  # shape: (batch_size,)
+    return similarity_scores  # shape: (batch_size,)
 
 
 def test_model_on_video(model,test_keypoints, actual_next_keypoints):
@@ -103,11 +104,31 @@ def test_model_on_video(model,test_keypoints, actual_next_keypoints):
     predicted_keypoints = model.predict(test_keypoints)  # shape: (batch_size, n_keypoints * 2)
 
     # MSE 기반 유사도 계산
-    similarity_scores, showing_scores = calculate_similarity(predicted_keypoints, actual_next_keypoints)
+    similarity_scores = calculate_similarity(predicted_keypoints, actual_next_keypoints)
+    # similarity_scores, showing_scores = calculate_similarity(predicted_keypoints, actual_next_keypoints)
 
     
-    return similarity_scores, showing_scores
+    return similarity_scores
+    # return similarity_scores, showing_scores
 
+# 키포인트 데이터를 정규화 (예: 0~1 범위로 변환)
+def normalize_keypoints(keypoints):
+    keypoints = np.array(keypoints)
+    max_value = np.max(keypoints)  # 최댓값 찾기
+    min_value = np.min(keypoints)  # 최솟값 찾기
+    return (keypoints - min_value) / (max_value - min_value + 1e-8)  # 작은 값 추가해 0 나눗셈 방지
+
+import tensorflow.keras.backend as K
+
+# R² (결정계수) 정의
+def r2_score(y_true, y_pred):
+    SS_res = K.sum(K.square(y_true - y_pred))
+    SS_tot = K.sum(K.square(y_true - K.mean(y_true)))
+    return 1 - SS_res / (SS_tot + K.epsilon())
+
+# RMSE 정의
+def rmse(y_true, y_pred):
+    return K.sqrt(K.mean(K.square(y_true - y_pred)))
 
 def infer():
     from training.visualization import net
@@ -118,9 +139,10 @@ def infer():
     status = 'None'
 
     print('시퀀스 데이터 분석 중...')
-    test_video_path = 'C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\oCam\\bowlingwallking\\seungmin.mp4'  # 테스트용 영상
+
+    test_video_path = 'C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\oCam\\bowlingwalking_output\\seungmin_nonono (2).mp4'  # 테스트용 영상
     output_folder = "C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\output"
-    # bowling_folder = 'C:\\Users\\SSAFY\\Desktop\\infer_out\\LSTM_Modified\\bowling'
+
 
     # walking / bowling 판별 , 이미지 저장용 keypoint 추출
     (skel_dataset,skel_datasetof2, img_list, bowling_start) = process_video_infer(test_video_path, output_folder)
@@ -137,24 +159,22 @@ def infer():
     bowling_skel_list = []
     for idx in tqdm(range(len(skel_datasetof2))):
         print(f"현재 idx: {idx}")    
-        # length = 10으로 해보고 안되면 20
+       
         length = 7
         
         test_list.append(skel_datasetof2[idx])
-        # print(f"스켈레톤 배열 크기 : {len(skel_dataset[idx])}") # expected : (17,2)
-        # print(f"이미지 배열 크기 : {len(img_list[idx])}") # expected : (17,2)
-        # print(f"현재 리스트 길이: {len(test_list)}")
+
         if len(test_list) == length:
             dataset = []
             dataset.append({'key': 0, 'value': test_list})
             dataset = InputData(dataset)
             dataset = DataLoader(dataset)
             test_list = []
-            # 각 이미지마다 skeleton 입히는 작업 추가하기 !!
             
             for data, label in dataset:
                 data = data.to(device)
                 with torch.no_grad():
+                    # 결과 
                     result = net(data)
                     print(f"현재 : {result}")
                     _, out = torch.max(result, 1)
@@ -166,7 +186,7 @@ def infer():
                     print(f"{idx}에서 학습된 결과: {status}")
             print(f"볼링 시작 idx: {bowling_start}, 끝 idx: {bowling_end}")
         cv2.putText(img_list[idx], status, (0, 30), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), 2)
-        # cv2.imshow(img_list[idx])
+        
         out_img_list.append(img_list[idx])
 
     # walking img list에 저장
@@ -175,7 +195,7 @@ def infer():
         img = cv2.resize(img_list[i], target_size)  # OpenCV resize 사용
 
         walking_img_list.append(img)
-    print(f"len(walking_img_list) : {len(walking_img_list)}")
+    
 
     
     # bowling img list에 저장
@@ -183,7 +203,7 @@ def infer():
         bowling_img_list.append(img_list[i])       # bowling_img_data
         bowling_skel_list.append(skel_dataset[i])  # bowling_skel_data 
         print(i)
-    print(f"len(walking_img_list) : {len(bowling_img_list)}")
+   
     # 이쪽에서 유사도 뽑아내서 -> 유사도를 기반으로 bowling_img_list에 있는 이미지에다가 유사도 붙여서 반환
     # ---------------- 회귀 기반 자세 교정 ---------------------
     
@@ -192,14 +212,21 @@ def infer():
     #  ---------------- 유사도 --------------------- 
 
     # 모델 로드
-    model = tf.keras.models.load_model('C:\\Users\\SSAFY\\Desktop\\hangi\\Bowling_Coach_Web\\model\\h5\\CNN_LSTM_V1.h5')
+    model = tf.keras.models.load_model('C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\similarity_measure\\measure_similarity_model.h5',custom_objects={'r2_score': r2_score, 'rmse': rmse})
     model.summary()
 
     # 데이터 준비
-    test_X_kp, test_y = prepare_training_data(
-        bowling_skel_list, # [[51],[51], ... 볼링중인 IDX 범위까지 ]
-        seq_length=5
-    )
+    if len(bowling_skel_list)>5:
+        test_X_kp, test_y = prepare_training_data(
+            bowling_skel_list, # [[51],[51], ... 볼링중인 IDX 범위까지 ]
+            seq_length=5
+        )
+    else:
+        test_X_kp, test_y = prepare_training_data(
+            skel_dataset, # [[51],[51], ... 볼링중인 IDX 범위까지 ]
+            seq_length=5
+        )
+
     
     windowsize = 5
     print(f"test_X의 키포인트 배열 크기: {test_X_kp.shape}")
@@ -207,25 +234,20 @@ def infer():
     test_X_kp = test_X_kp.reshape((test_X_kp.shape[0], windowsize, 51, 1))
     test_y = test_y.reshape((test_y.shape[0], 51))
 
-    # 모델 테스트 및 유사도 측정
-    similarity_scores,showing_scores = test_model_on_video(model, test_X_kp, test_y)
+    test_X_kp = normalize_keypoints(test_X_kp)
+    test_y = normalize_keypoints(test_y)
     
+    # 모델 테스트 및 유사도 측정
+    similarity_scores = test_model_on_video(model, test_X_kp, test_y)
     
     # 평균 유사도 계산
     avg_similarity = np.mean(similarity_scores)
     
     # 전체 점수 계산
-    avg_scores = np.mean(showing_scores)
-
-    # 0보다 작으면 0, 100보다 크면 100으로 저장
-    showing_scores = np.clip(showing_scores, 0, 100)
-
-    print(f"showing_scores shape : {showing_scores.shape}")
-    print(showing_scores)
     print(f"Similarity Scores: {similarity_scores}")
-    print(f"Average Similarity Score: {avg_similarity:.1f}")
+    print(f"Average Similarity Score: {avg_similarity:.2f}")
 
-    print(avg_scores) ##### json 저장 필요요
+    # print(avg_scores) ##### json 저장 필요요
     print(avg_similarity)
 
     # --------------------------------------------
@@ -237,27 +259,25 @@ def infer():
 
     frames_with_keypoints = []
 
-    # 저장 경로 설정
-    # base_dir = 'C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\similarity_measure'
-    # opt_path = os.path.join(base_dir, "joint")
-    # os.makedirs(opt_path, exist_ok=True)  # 폴더가 없으면 생성
     # 이미지 로드 및 전처리
     for i, img in enumerate(bowling_img_list):
+
         # 이미지 로드
-        # img_path = os.path.join(test_image_folder, img_file)
-        # img = cv2.imread(img_path)
         if img is None:
             print(f"이미지를 불러올 수 없습니다 ")
             continue  # 이미지 로드 실패 시 건너뛰기
+
         # 이미지 크기 조정
         img = cv2.resize(img, target_size)  # OpenCV resize 사용
-        # 유사도 점수 기반 텍스트 추가
-        accuracy_text = f"Accuracy: {showing_scores[i]:.1f}"
 
-        if showing_scores[i] > 50:
+        # 유사도 점수 기반 텍스트 추가
+        accuracy_text = f"Accuracy: {similarity_scores[i]:.2f}"
+
+        if similarity_scores[i] > 50:
             text_color = (0, 255, 0)  # 초록색
         else:
             text_color = (0, 0, 255)  # 빨간색
+
         # 이미지 위에 텍스트 추가
         cv2.putText(
             img,  # ✅ 올바른 입력 (numpy 배열)
@@ -267,7 +287,6 @@ def infer():
             text_color, 2  # 색상과 두께
         )
 
-        # frames_with_keypoints.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         frames_with_keypoints.append(img)
     # -----------------------------------------------------------
     # -------------------walking + bowling(keypoint) 합치기 -------------
@@ -280,16 +299,14 @@ def infer():
 
     # 저장할 파일 경로
     file_path = "C:\\Users\\SSAFY\\Desktop\\S12P11B202\\AI\\output\\similarity_Score.json"
+
     # 점수를 딕셔너리 형태로 준비
-    data = {"score": float(avg_scores)}
+    data = {"score": float(avg_similarity)}
 
     # JSON 파일로 저장
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
 
-    # to_mp4(out_img_list, fps=30, input_file_path=test_video_path, output_folder=output_folder)
-    # to_mp4(bowling_img_list, fps=30, input_file_path=test_video_path, output_folder=bowling_folder)
-    
-    to_mp4(walking_img_list, fps=30, input_file_path=test_video_path, output_folder=output_folder)
+    to_mp4(walking_img_list, fps=5, input_file_path=test_video_path, output_folder=output_folder)
 
     return bowling_skel_list
