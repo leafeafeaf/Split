@@ -14,6 +14,26 @@ import { updateHighlight } from "@/app/features/userSlice"
 import { HighlightWarningModal } from "@/components/modals/highlight-warning-modal"
 import { toast } from "sonner"
 
+function parseCorrectionTexts(textArray: string | string[]): string {
+  if (typeof textArray === 'string') {
+    // 문자열에서 대괄호와 따옴표 제거
+    const cleanedString = textArray.replace(/^\["|"\]$/g, '');
+    // 큰따옴표와 쉼표로 분리
+    const arrayFromString = cleanedString.split('","');
+
+    return arrayFromString.map(text => {
+      const match = text.match(/오차: [-\d\.]+ %, (.+)/);
+      return match ? `${match[1]}\n` : '';
+    }).join('');
+  }
+
+  return textArray.map(text => {
+    const match = text.match(/오차: [-\d\.]+ %, (.+)/);
+    return match ? `${match[1]}\n` : '';
+  }).join('');
+}
+
+
 export default function RoundEvaluationClient({ params }: { params: { id: string } }) {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -64,22 +84,29 @@ export default function RoundEvaluationClient({ params }: { params: { id: string
   }
 
   const handleHighlightConfirm = async () => {
-    if (!currentFrame?.video || !user) return
+    if (!currentFrame?.video || !user) {
+      toast.error('No video available');
+      return;
+    }
 
     try {
-      // Check if user already has a highlight video
-      const isUpdate = !!user.highlight
-      await dispatch(updateHighlight({ highlight: currentFrame.video, isUpdate })).unwrap()
-      toast.success(`Highlight video ${isUpdate ? "updated" : "set"} successfully!`)
-      setShowWarningModal(false)
+      const isUpdate = !!user.highlight;
+      const result = await dispatch(updateHighlight({
+        highlight: currentFrame.video,
+        isUpdate
+      })).unwrap();
+
+      toast.success(`Highlight video ${isUpdate ? 'updated' : 'set'} successfully!`);
+      setShowWarningModal(false);
     } catch (error) {
-      if (typeof error === "string") {
-        toast.error(error)
+      if (typeof error === 'string') {
+        toast.error(error);
       } else {
-        toast.error("Failed to set highlight video")
+        toast.error('Failed to set highlight video');
       }
+      console.error('Highlight update error:', error);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -155,9 +182,12 @@ export default function RoundEvaluationClient({ params }: { params: { id: string
         <Card className="bg-[#1E1E2D] p-6">
           <div className="space-y-4 text-center">
             <p className="text-red-500 text-xl mb-2">AI Comment</p>
-            <p className="text-white text-lg">{currentFrame.feedback}</p>
+            <p className="text-white text-lg whitespace-pre-line">
+              {currentFrame.feedback && parseCorrectionTexts(currentFrame.feedback)}
+            </p>
           </div>
         </Card>
+
 
         <div className="space-y-4">
           <h2 className="text-2xl text-white text-center font-medium">Highlight</h2>
@@ -172,10 +202,19 @@ export default function RoundEvaluationClient({ params }: { params: { id: string
           </Card>
         </div>
 
-        <ButtonPrimary onClick={handleSetHighlight} disabled={highlightUpdateLoading} className="w-full py-4">
-          {highlightUpdateLoading
-            ? "Setting..."
-            : `${user?.highlight ? "하이라이트 영상 수정" : "하이라이트 영상 지정"}`}
+        <ButtonPrimary
+          onClick={handleSetHighlight}
+          disabled={highlightUpdateLoading}
+          className="w-full py-4"
+        >
+          {highlightUpdateLoading ? (
+            <div className="flex items-center justify-center">
+              <div className="mr-2">Setting...</div>
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+            </div>
+          ) : (
+            user?.highlight ? "하이라이트 영상 수정" : "하이라이트 영상 지정"
+          )}
         </ButtonPrimary>
       </div>
 
@@ -187,4 +226,7 @@ export default function RoundEvaluationClient({ params }: { params: { id: string
     </div>
   )
 }
+
+
+
 
