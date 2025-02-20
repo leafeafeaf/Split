@@ -1,1 +1,8 @@
+*.mp4
+__pycache__
+*.ipynb
+*.json
+*.jpg
+*.zip
 .env
+
