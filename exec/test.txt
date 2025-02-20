@@ -1,0 +1,5 @@
+테스트 계정
+
+ID : user2@hotmail.com
+PW : hashed_password_1
+
