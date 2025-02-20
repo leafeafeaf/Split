@@ -139,11 +139,18 @@ export default function RoundEvaluationClient({ params }: { params: { id: string
               <p className="text-2xl font-bold text-white text-center">{currentFrame.armStabilityScore}</p>
             </div>
             <div className="bg-[#1E1E2D] p-4 rounded-lg">
-              <p className="text-[#9CB1D1] text-center text-sm">Score</p>
-              <p className="text-2xl font-bold text-white text-center">{currentFrame.poseScore}</p>
+              <p className="text-[#9CB1D1] text-center text-sm">Speed</p>
+              <p className="text-2xl font-bold text-white text-center">{currentFrame.speed}</p>
             </div>
           </div>
         </div>
+
+        <Card className="bg-[#1E1E2D] p-6 mb-4">
+          <div className="text-center">
+            <p className="text-[#9CB1D1] text-xl mb-2">Score</p>
+            <p className="text-4xl font-bold text-white">{currentFrame.poseScore}</p>
+          </div>
+        </Card>
 
         <Card className="bg-[#1E1E2D] p-6">
           <div className="space-y-4 text-center">
