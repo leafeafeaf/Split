@@ -40,7 +40,7 @@ spring:
       org.hibernate.tool.hbm2ddl: debug  # 스키마 생성 관련 로그
   sql:
     init:
-      mode: always
+      mode: never
   # AWS 설정
 cloud:
   aws:
