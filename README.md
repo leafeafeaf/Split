@@ -1,12 +1,13 @@
 
 # 🎳B202 - Split(Smart Bowling Coach)
 ## 📋Project Overview
-<iframe width="600" height="340" src="https://www.youtube.com/embed/iURQwFUxwmo" frameborder="0" allowfullscreen></iframe>
+[![영상 보기](https://img.youtube.com/vi/iURQwFUxwmo/0.jpg)](https://www.youtube.com/watch?v=iURQwFUxwmo)
+
 
 스마트 볼링 코치 시스템을 통한 효율적인 자세 교정 및 실력 향상 솔루션
 [설계](https://www.miricanvas.com/v/1479h8x) | [최종 발표](docs/pdf/SPlit_최종발표.pdf)
 
-## :bowling:기능
+## :bowling: 기능
 
 1. 투구 자세 측정 및 평가
    1. 영상을 통한 자세 평가
@@ -19,19 +20,19 @@
 <img src="docs/gif/측정결과.gif" width=200>
 <img src="docs/gif/랭킹.gif" width=200>
 
-## :gift_heart:기대효과
+## :gift_heart: 기대효과
 
-**1. :thumbsup:편의성**
+**1. :thumbsup: 편의성**
 사용자가 자신의 자세를 손쉽게 측정하고 피드백 받을 수 있다.
 
-**2. :pray:호환성**
+**2. :pray: 호환성**
    기존 볼링 시스템에 호환되도록 하드웨어를 구성하여 설치 비용을 절감
 
-**3. :laughing:재미**
+**3. :laughing: 재미**
    데이터 기반 실력 향상, 랭킹 시스템을 이용한 경쟁 요소로 볼링에 대한 흥미 유발
 
-## :cop:측정 및 평가
-### :camera:AI를 통한 평가
+## :cop: 측정 및 평가
+### :camera: AI를 통한 평가
 <img src="docs/img/AI파이프라인.png" width=350>
 <img src="docs/img/데이터 전처리.png" width=350>
 
@@ -40,7 +41,7 @@ LSTM + CNN
 - 평가 결과
 <img src="docs/gif/모델처리후.gif" width=250>
 
-### :hand:아대를 통한 평가
+### :hand: 아대를 통한 평가
 - 제작 하드웨어
 <img src="docs/img/아대.png" height=250>
 <br>
@@ -61,17 +62,17 @@ LSTM + CNN
 <img src="https://img.shields.io/badge/intellijidea-000000?style=flat&logo=intellijidea&logoColor=white"/> <img src="https://img.shields.io/badge/androidstudio-3DDC84?style=flat&logo=androidstudio&logoColor=white"/> <img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat-square&logo=Visual Studio Code&logoColor=white"/> <img src="https://img.shields.io/badge/postman-FF6C37?style=flat&logo=postman&logoColor=white"/>
 
 ## 사진
-아키텍처
+### 아키텍처
 <img src="docs/img/아키텍처.png" width=350>
 
-회귀분석
+### 학습 데이터셋 구축
+<img src="docs/img/데이터셋.png" width=350>
+
+### 회귀분석
 <img src="docs/img/회귀분석.png" width=350>
 
-모델 학습 결과
+### 모델 학습 결과
 <img src="docs/img/모델학습결과.png" width=350>
-
-학습 데이터셋 구축
-<img src="docs/img/데이터셋.png" width=350>
 
 
 ## 🔗 Links & Resources
