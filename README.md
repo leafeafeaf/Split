@@ -1,7 +1,78 @@
 
-# 🎳 B202 - Smart Bowling Coach
-## 📋 Project Overview
+# 🎳B202 - Split(Smart Bowling Coach)
+## 📋Project Overview
+<iframe width="600" height="340" src="https://www.youtube.com/embed/iURQwFUxwmo" frameborder="0" allowfullscreen></iframe>
+
 스마트 볼링 코치 시스템을 통한 효율적인 자세 교정 및 실력 향상 솔루션
+[설계](https://www.miricanvas.com/v/1479h8x) | [최종 발표](docs/pdf/SPlit_최종발표.pdf)
+
+## :bowling:기능
+
+1. 투구 자세 측정 및 평가
+   1. 영상을 통한 자세 평가
+   2. 아대를 통한 자세 평가
+2. 점수 시각화 & 피드백
+3. Ranking 시스템
+
+<img src="docs/gif/측정시작.gif" width=200>
+<img src="docs/gif/측정중.gif" width=200>
+<img src="docs/gif/측정결과.gif" width=200>
+<img src="docs/gif/랭킹.gif" width=200>
+
+## :gift_heart:기대효과
+
+**1. :thumbsup:편의성**
+사용자가 자신의 자세를 손쉽게 측정하고 피드백 받을 수 있다.
+
+**2. :pray:호환성**
+   기존 볼링 시스템에 호환되도록 하드웨어를 구성하여 설치 비용을 절감
+
+**3. :laughing:재미**
+   데이터 기반 실력 향상, 랭킹 시스템을 이용한 경쟁 요소로 볼링에 대한 흥미 유발
+
+## :cop:측정 및 평가
+### :camera:AI를 통한 평가
+<img src="docs/img/AI파이프라인.png" width=350>
+<img src="docs/img/데이터 전처리.png" width=350>
+
+LSTM + CNN
+
+- 평가 결과
+<img src="docs/gif/모델처리후.gif" width=250>
+
+### :hand:아대를 통한 평가
+- 제작 하드웨어
+<img src="docs/img/아대.png" height=250>
+<br>
+- 회로도1
+<img src="docs/img/회로도1.png" width=350>
+- 회로도2
+<img src="docs/img/회로도2.png" width=350>
+
+
+## <img src="https://img.shields.io/badge/tech-243396?style=flat&logo=Java&logoColor=white"/>기술 스택
+### platforms & languages
+<img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat&logo=springboot&logoColor=white"/> <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat&logo=springsecurity&logoColor=white"/> <img src="https://img.shields.io/badge/redis-FF4438?style=flat&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/mysql-4479A1?style=flat&logo=mysql&logoColor=white"/> <img src="https://img.shields.io/badge/jsonwebtokens-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=Next.js&logoColor=white"/> <img src="https://img.shields.io/badge/typescript-3178C6?style=flat&logo=typescript&logoColor=white"/> <img src="https://img.shields.io/badge/css3-1572B6?style=flat&logo=css3&logoColor=white"/> <img src="https://img.shields.io/badge/html5-E34F26?style=flat&logo=html5&logoColor=white"/> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
+<img src="https://img.shields.io/badge/python-3776AB?style=flat&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/tensorflow-FF6F00?style=flat&logo=tensorflow&logoColor=white"/> <img src="https://img.shields.io/badge/opencv-5C3EE8?style=flat&logo=opencv&logoColor=white"/> <img src="https://img.shields.io/badge/cnn-CC0000?style=flat&logo=cnn&logoColor=white"/>
+<img src="https://img.shields.io/badge/amazonec2-FF9900?style=flat&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/amazons3-569A31?style=flat&logo=amazons3&logoColor=white"/> <img src="https://img.shields.io/badge/Ubuntu-E95420?style=flat-square&logo=Ubuntu&logoColor=white"/> <img src="https://img.shields.io/badge/nginx-009639?style=flat&logo=nginx&logoColor=white"/> <img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white"/> <img src="https://img.shields.io/badge/gitlab-FC6D26?style=flat&logo=gitlab&logoColor=white"/> <img src="https://img.shields.io/badge/Docker-%230db7ed?style=flat&logo=Docker&logoColor=white"/> <img src="https://img.shields.io/badge/jenkins-D24939?style=flat&logo=jenkins&logoColor=white"/>
+
+### tools
+<img src="https://img.shields.io/badge/intellijidea-000000?style=flat&logo=intellijidea&logoColor=white"/> <img src="https://img.shields.io/badge/androidstudio-3DDC84?style=flat&logo=androidstudio&logoColor=white"/> <img src="https://img.shields.io/badge/Visual Studio Code-007ACC?style=flat-square&logo=Visual Studio Code&logoColor=white"/> <img src="https://img.shields.io/badge/postman-FF6C37?style=flat&logo=postman&logoColor=white"/>
+
+## 사진
+아키텍처
+<img src="docs/img/아키텍처.png" width=350>
+
+회귀분석
+<img src="docs/img/회귀분석.png" width=350>
+
+모델 학습 결과
+<img src="docs/img/모델학습결과.png" width=350>
+
+학습 데이터셋 구축
+<img src="docs/img/데이터셋.png" width=350>
+
 
 ## 🔗 Links & Resources
 - [Repository](https://lab.ssafy.com/s12-webmobile3-sub1/S12P11B202)
@@ -9,17 +80,17 @@
 
 
 ## 🤝 Ground Rules
-<img src="./ground.jpg" width="70%" alt="ground">
+<img src="docs/img/ground.jpg" width="70%" alt="ground">
 
 
 ## 👥 Team Members
 | Profile | Role | Position |
 |---------|------|-----------|
-| [편민준](https://www.notion.so/174ffc8046b68058bf70c3d74dd2a320) | Team Leader | Backend |
-| [이해수](https://www.notion.so/174ffc8046b6803ea1a9db8496650681) | Developer | IoT | 
-| [김성민](https://www.notion.so/174ffc8046b680a1af91d4b4e712e9c1) | Developer | IoT | AI |
-| [최혁규](https://www.notion.so/174ffc8046b6808f97edc2625c93e472) | Developer | IoT |
-| [이길호](https://www.notion.so/174ffc8046b6807894d5df96d652b597) | Developer | Frontend |
+| [편민준](https://www.notion.so/174ffc8046b68058bf70c3d74dd2a320) | Team Leader | BE Infra |
+| [이해수](https://www.notion.so/174ffc8046b6803ea1a9db8496650681) | Developer | AI | 
+| [김성민](https://www.notion.so/174ffc8046b680a1af91d4b4e712e9c1) | Developer | BE Infra |
+| [최혁규](https://www.notion.so/174ffc8046b6808f97edc2625c93e472) | Developer | FE IoT |
+| [이길호](https://www.notion.so/174ffc8046b6807894d5df96d652b597) | Developer | FE IoT |
 | [백승민](https://www.notion.so/174ffc8046b6807a9716f5807a90f255) | Developer | AI |
 
 
@@ -53,8 +124,6 @@
 아이디어 기획기간 중 번이 10번의 스크럼 및 회의가 진행되었고, 스크럼에서는 팀원들이 각자의 진행 상황을 공유하고 발생한 이슈들을 함께 논의하여 프로젝트를 원활하게 진행할 수 있었습니다.
 또한 프로젝트의 성공적인 완수를 위해 초기 단계에서 체계적인 기획 과정을 거쳤으며, 이를 통해 팀원들의 다양한 아이디어를 수렴하고 프로젝트의 방향성을 명확히 설정할 수 있었습니다.
 
-![image.png](./image.png)
-
----
+![image.png](docs/img/회의록.png)
 
 [](https://www.notion.so/17cffc8046b680b49c33f385f59156cf?pvs=21)
