@@ -73,11 +73,11 @@
 </tr>
 <tr>
    <td>Jetson orin nano</td>
-   <td>메인 컴퓨팅 기기, 온디바이스 AI로 영상을 기반으로 사용자 자세 평가 수행행</td>
+   <td>메인 컴퓨팅 기기, 온디바이스 AI로 영상을 기반으로 사용자 자세 평가 수행</td>
 </tr>
 <tr>
    <td>카메라</td>
-   <td>사용자 후면에서 투구 자세 촬영영</td>
+   <td>사용자 후면에서 투구 자세 촬영</td>
 </tr>
 </table> 
 
@@ -95,7 +95,7 @@ LSTM + CNN
 - 평가 결과
 <img src="docs/gif/모델처리후.gif" width=250>
 
-### :hand: 아대를 통한 평가
+### :raised_hand: 아대를 통한 평가
 - 제작 하드웨어
 <img src="docs/img/아대.png" height=250>
 <br>
