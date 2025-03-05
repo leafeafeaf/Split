@@ -31,6 +31,60 @@
 **3. :laughing: 재미**
    데이터 기반 실력 향상, 랭킹 시스템을 이용한 경쟁 요소로 볼링에 대한 흥미 유발
 
+## 개발 요소
+![alt text](docs/img/개발요소.png)
+### 아대
+- 팔의 요소를 측정 및 사용자 입력 인터페이스
+- 사용자의 투구를 방해하지 않기 위해 경량화를 핵심으로 설계
+<table>
+<tr>
+   <th>부품</th>
+   <th>설명</th>
+</tr>
+<tr>
+   <td>ESP32</td>
+   <td>센서 데이터 처리 및 출력 제어</td>
+</tr>
+<tr>
+   <td>MPU6050 센서</td>
+   <td>자이로/가속도 센서 2개를 이용하여 팔의 각도 및 팔 안정성 점수 측정</td>
+</tr>
+<tr>
+   <td>LED</td>
+   <td>평가 점수에 대한 대략적인 정보 제공</td>
+</tr>
+<tr>
+   <td>터치 센서</td>
+   <td>측정 시작 및 측정 완료에 대한 입력</td>
+</tr>
+<tr>
+   <td>wifi 모듈</td>
+   <td>메인 디바이스와 소켓 통신 수행</td>
+</tr>
+</table>
+
+### 메인 디바이스
+- 사용자의 후면을 촬영하여 볼링 점수를 추출하는 메인 디바이스
+- 아대 점수와 관절 정보를 종합하여 최종 점수 및 피드백 산출
+<table>
+<tr>
+   <th>부품</th>
+   <th>설명</th>
+</tr>
+<tr>
+   <td>Jetson orin nano</td>
+   <td>메인 컴퓨팅 기기, 온디바이스 AI로 영상을 기반으로 사용자 자세 평가 수행행</td>
+</tr>
+<tr>
+   <td>카메라</td>
+   <td>사용자 후면에서 투구 자세 촬영영</td>
+</tr>
+</table> 
+
+### 모바일 웹
+- PWA
+- Next.js + Android Studio
+
 ## :cop: 측정 및 평가
 ### :camera: AI를 통한 평가
 <img src="docs/img/AI파이프라인.png" width=350>
@@ -53,9 +107,9 @@ LSTM + CNN
 
 ## <img src="https://img.shields.io/badge/tech-243396?style=flat&logo=Java&logoColor=white"/>기술 스택
 ### platforms & languages
-<img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat&logo=springboot&logoColor=white"/> <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat&logo=springsecurity&logoColor=white"/> <img src="https://img.shields.io/badge/redis-FF4438?style=flat&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/mysql-4479A1?style=flat&logo=mysql&logoColor=white"/> <img src="https://img.shields.io/badge/jsonwebtokens-000000?style=flat&logo=jsonwebtokens&logoColor=white"/>
-<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=Next.js&logoColor=white"/> <img src="https://img.shields.io/badge/typescript-3178C6?style=flat&logo=typescript&logoColor=white"/> <img src="https://img.shields.io/badge/css3-1572B6?style=flat&logo=css3&logoColor=white"/> <img src="https://img.shields.io/badge/html5-E34F26?style=flat&logo=html5&logoColor=white"/> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
-<img src="https://img.shields.io/badge/python-3776AB?style=flat&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/tensorflow-FF6F00?style=flat&logo=tensorflow&logoColor=white"/> <img src="https://img.shields.io/badge/opencv-5C3EE8?style=flat&logo=opencv&logoColor=white"/> <img src="https://img.shields.io/badge/cnn-CC0000?style=flat&logo=cnn&logoColor=white"/>
+<img src="https://img.shields.io/badge/Java-007396?style=flat&logo=Java&logoColor=white"/> <img src="https://img.shields.io/badge/springboot-6DB33F?style=flat&logo=springboot&logoColor=white"/> <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=flat&logo=springsecurity&logoColor=white"/> <img src="https://img.shields.io/badge/redis-FF4438?style=flat&logo=redis&logoColor=white"/> <img src="https://img.shields.io/badge/mysql-4479A1?style=flat&logo=mysql&logoColor=white"/> <img src="https://img.shields.io/badge/jsonwebtokens-000000?style=flat&logo=jsonwebtokens&logoColor=white"/><br>
+<img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=Next.js&logoColor=white"/> <img src="https://img.shields.io/badge/typescript-3178C6?style=flat&logo=typescript&logoColor=white"/> <img src="https://img.shields.io/badge/css3-1572B6?style=flat&logo=css3&logoColor=white"/> <img src="https://img.shields.io/badge/html5-E34F26?style=flat&logo=html5&logoColor=white"/> <img src="https://img.shields.io/badge/tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/><br>
+<img src="https://img.shields.io/badge/python-3776AB?style=flat&logo=python&logoColor=white"/> <img src="https://img.shields.io/badge/tensorflow-FF6F00?style=flat&logo=tensorflow&logoColor=white"/> <img src="https://img.shields.io/badge/opencv-5C3EE8?style=flat&logo=opencv&logoColor=white"/> <img src="https://img.shields.io/badge/cnn-CC0000?style=flat&logo=cnn&logoColor=white"/><br>
 <img src="https://img.shields.io/badge/amazonec2-FF9900?style=flat&logo=amazonec2&logoColor=white"/> <img src="https://img.shields.io/badge/amazons3-569A31?style=flat&logo=amazons3&logoColor=white"/> <img src="https://img.shields.io/badge/Ubuntu-E95420?style=flat-square&logo=Ubuntu&logoColor=white"/> <img src="https://img.shields.io/badge/nginx-009639?style=flat&logo=nginx&logoColor=white"/> <img src="https://img.shields.io/badge/git-F05032?style=flat&logo=git&logoColor=white"/> <img src="https://img.shields.io/badge/gitlab-FC6D26?style=flat&logo=gitlab&logoColor=white"/> <img src="https://img.shields.io/badge/Docker-%230db7ed?style=flat&logo=Docker&logoColor=white"/> <img src="https://img.shields.io/badge/jenkins-D24939?style=flat&logo=jenkins&logoColor=white"/>
 
 ### tools
