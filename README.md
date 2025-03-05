@@ -101,6 +101,7 @@ LSTM + CNN
 <br>
 - 회로도1
 <img src="docs/img/회로도1.png" width=350>
+<br>
 - 회로도2
 <img src="docs/img/회로도2.png" width=350>
 
@@ -135,7 +136,7 @@ LSTM + CNN
 
 
 ## 🤝 Ground Rules
-<img src="docs/img/ground.jpg" width="70%" alt="ground">
+<img src="docs/img/ground.jpg" width="50%" alt="ground">
 
 
 ## 👥 Team Members
